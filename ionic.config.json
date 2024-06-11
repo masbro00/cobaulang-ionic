@@ -1,0 +1,7 @@
+{
+  "name": "cobaulang",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
