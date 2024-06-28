@@ -1,0 +1,44 @@
+.swiper-container {
+  width: 100%;
+  height: auto;
+}
+
+.swiper-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%; /* Pastikan slide mengambil tinggi penuh dari kontainer */
+  padding: 1px; /* Tambahkan padding jika diperlukan untuk menghindari terpotong */
+  box-sizing: border-box; /* Termasuk padding dalam perhitungan ukuran */
+}
+
+.poster-image {
+  width: 100%;
+  height: auto; /* Gunakan auto untuk menjaga rasio aspek */
+  max-width: 100%; /* Batasi lebar maksimum gambar agar tidak terlalu besar */
+  max-height: 80vh; /* Batasi tinggi maksimum gambar agar tidak terlalu besar */
+  margin-bottom: 10px; /* Sesuaikan margin-bottom jika diperlukan */
+  object-fit: contain; /* Pastikan gambar tetap proporsional dalam ruang yang diberikan */
+}
+
+.text-content {
+  font-size: 1.2em; /* Sesuaikan sesuai kebutuhan */
+}
+
+@media (min-width: 768px) {
+  .swiper-container {
+    max-width: 1200px; /* Batasi lebar kontainer pada layar yang lebih besar */
+    margin: 0 auto; /* Pusatkan kontainer */
+  }
+
+  .poster-image {
+    max-width: 100%; /* Batasi lebar maksimum gambar agar tidak terlalu besar */
+    max-height: 70vh; /* Batasi tinggi maksimum gambar agar tidak terlalu besar pada layar yang lebih besar */
+  }
+
+  .text-content {
+    font-size: 1.5em; /* Sesuaikan sesuai kebutuhan */
+  }
+}
