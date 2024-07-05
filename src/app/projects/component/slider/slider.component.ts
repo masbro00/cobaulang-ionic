@@ -25,7 +25,7 @@ export class SwiperComponent implements AfterViewInit {
     this.initializeSwiper();
   }
 
-  initializeSwiper(): void {
+  initializeSwiper(): any {
     if (this.swiperContainer && this.swiperContainer.nativeElement) {
       const swiper = new Swiper(this.swiperContainer.nativeElement, {
         slidesPerView: this.slidePerView,
@@ -37,6 +37,11 @@ export class SwiperComponent implements AfterViewInit {
           el: '.swiper-pagination',
           clickable: true,
         },
+        breakpoints:{
+          768:{
+            slidesPerView: 2
+          }
+        }
       });
     } else {
       console.error('Swiper container element not found');

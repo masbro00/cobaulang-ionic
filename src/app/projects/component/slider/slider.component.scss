@@ -2,7 +2,6 @@
   width: 100%;
   height: auto;
 }
-
 .swiper-slide {
   display: flex;
   flex-direction: column;
@@ -13,14 +12,19 @@
   padding: 1px; /* Tambahkan padding jika diperlukan untuk menghindari terpotong */
   box-sizing: border-box; /* Termasuk padding dalam perhitungan ukuran */
 }
+.poster-image-container{
+  width: 100%;
 
+}
 .poster-image {
   width: 100%;
-  height: auto; /* Gunakan auto untuk menjaga rasio aspek */
-  max-width: 100%; /* Batasi lebar maksimum gambar agar tidak terlalu besar */
-  max-height: 80vh; /* Batasi tinggi maksimum gambar agar tidak terlalu besar */
-  margin-bottom: 10px; /* Sesuaikan margin-bottom jika diperlukan */
-  object-fit: contain; /* Pastikan gambar tetap proporsional dalam ruang yang diberikan */
+  background-size: cover;
+  background-position: 50% 50%;
+  // height: auto; /* Gunakan auto untuk menjaga rasio aspek */
+  // max-width: 100%; /* Batasi lebar maksimum gambar agar tidak terlalu besar */
+  // max-height: 80vh; /* Batasi tinggi maksimum gambar agar tidak terlalu besar */
+  // margin-bottom: 10px; /* Sesuaikan margin-bottom jika diperlukan */
+  // object-fit: cover; /* Pastikan gambar tetap proporsional dalam ruang yang diberikan */
 }
 
 .text-content {
@@ -33,10 +37,21 @@
     margin: 0 auto; /* Pusatkan kontainer */
   }
 
-  .poster-image {
-    max-width: 100%; /* Batasi lebar maksimum gambar agar tidak terlalu besar */
-    max-height: 70vh; /* Batasi tinggi maksimum gambar agar tidak terlalu besar pada layar yang lebih besar */
+  .poster-image-container{
+    width: auto;
+    height: calc(100vh - 113px);
+    overflow: hidden;
   }
+  .poster-image {
+    width: auto;
+    height: 100%;
+    background-size: cover;
+    
+    // max-width: 100%; /* Batasi lebar maksimum gambar agar tidak terlalu besar */
+    // max-height: 70vh; /* Batasi tinggi maksimum gambar agar tidak terlalu besar pada layar yang lebih besar */
+  }
+
+  
 
   .text-content {
     font-size: 1.5em; /* Sesuaikan sesuai kebutuhan */

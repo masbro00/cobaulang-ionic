@@ -1,7 +1,12 @@
 <div #swiperContainer class="swiper-container">
   <div class="swiper-wrapper">
     <div *ngFor="let item of sliderInputValue" class="swiper-slide" (click)="sliderClickEventTrigger(item.modelItem)">
-      <img [src]="item.posterPath" class="poster-image">
+      <div class="poster">
+        <div class="poster-image-container">
+          <img [src]="item.posterPath" class="poster-image">
+        </div>
+        
+      </div>  
     </div>
   </div>
   <!-- Tombol navigasi -->
