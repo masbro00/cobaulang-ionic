@@ -29,10 +29,10 @@ export class SwiperComponent implements AfterViewInit {
     if (this.swiperContainer && this.swiperContainer.nativeElement) {
       const swiper = new Swiper(this.swiperContainer.nativeElement, {
         slidesPerView: this.slidePerView,
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
+        // navigation: {
+        //   nextEl: '.swiper-button-next',
+        //   prevEl: '.swiper-button-prev',
+        // },
         pagination: {
           el: '.swiper-pagination',
           clickable: true,

@@ -1,3 +1,6 @@
-<p>
-  card works!
-</p>
+<div (click)="cardClickEventTrigger(model)">
+  <div>
+    <ion-img [src]="image"></ion-img>
+  </div>
+  <ion-title class="ion-margin-vertical text-content">{{title}}</ion-title>
+</div>

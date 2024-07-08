@@ -27,6 +27,8 @@
   // object-fit: cover; /* Pastikan gambar tetap proporsional dalam ruang yang diberikan */
 }
 
+
+
 .text-content {
   font-size: 1.2em; /* Sesuaikan sesuai kebutuhan */
 }
@@ -49,6 +51,14 @@
     
     // max-width: 100%; /* Batasi lebar maksimum gambar agar tidak terlalu besar */
     // max-height: 70vh; /* Batasi tinggi maksimum gambar agar tidak terlalu besar pada layar yang lebih besar */
+  }
+
+  .swiper-pagination {
+    position: absolute;
+    bottom: 10px; /* Sesuaikan posisi vertikal */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
   }
 
   

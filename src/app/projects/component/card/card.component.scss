@@ -1,0 +1,14 @@
+.text-content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
+}
+
+.poster-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 3; /* Sesuaikan rasio aspek sesuai dengan ukuran poster */
+    object-fit: cover;
+  }
+  
