@@ -108,4 +108,28 @@ export class Tab1Page implements OnInit {
     this.genreSelectedValue = event.detail.value;
     // Tambahkan logika tambahan yang diperlukan untuk menangani perubahan genre di sini
   }
-}
+
+  loadData(event:any) {
+    this.page = this.page + 1;
+    this.service.getPopularList(this.modelType, this.page, this.filteredGenreId).subscribe(
+      (popularMoviesEl: any) => {
+        popularMoviesEl.results.forEach((element: any) => {
+          const posterUrl = `https://image.tmdb.org/t/p/w500${element.poster_path}`;
+          this.appCardContainer.push({
+            id: element.id,
+            title: element.title,
+            description: element.overview,
+            release: element.release_date,
+            image: posterUrl,
+            voterRating: element.voter_average,
+            modelItem: element
+    });
+   });
+   event.target.complete();
+   if (popularMoviesEl.results.lenght == 0) {
+    event.target.disabled = true;
+   }
+
+  });
+  }
+} 

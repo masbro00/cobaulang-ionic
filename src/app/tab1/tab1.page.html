@@ -16,17 +16,17 @@
     <ion-grid fixed="true">
       <div>
         <ion-list>
-        <ion-item>
-          <ion-label>Pencarian Film by Genre</ion-label>
-          <ion-icon style="font-size: 24px;" name="filter"></ion-icon>
-          <ion-select placeholder="Pilih" [value]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)" multiple>
-            <ion-select-option *ngFor="let genre of genreContainerList" [value]="genre.id">{{genre.name}}</ion-select-option>
-          </ion-select>
-        </ion-item>  
+          <ion-item>
+            <ion-label>Pencarian Film by Genre</ion-label>
+            <ion-icon style="font-size: 24px;" name="filter"></ion-icon>
+            <ion-select placeholder="Pilih" [value]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)" multiple>
+              <ion-select-option *ngFor="let genre of genreContainerList" [value]="genre.id">{{genre.name}}</ion-select-option>
+            </ion-select>
+          </ion-item>  
 
-        <ion-item>
-          <ion-label style="font-size: 18px;">Film Populer</ion-label>
-        </ion-item>
+          <ion-item>
+            <ion-label style="font-size: 18px;">Film Populer</ion-label>
+          </ion-item>
         </ion-list>
       </div>
       
@@ -36,6 +36,13 @@
         </ion-col>
       </ion-row>
     </ion-grid>
+
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+      <ion-infinite-scroll-content
+        loadingSpinner="bubbles"
+        loadingText="Loading more data...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
 
   </ion-list>
 </ion-content>
