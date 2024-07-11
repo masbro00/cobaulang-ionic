@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ThemoviedbService } from '../projects/api/service/themoviedb.service';
-import { initialize } from '@ionic/core';
 
 @Component({
   selector: 'app-tab1',
@@ -8,21 +7,22 @@ import { initialize } from '@ionic/core';
   styleUrls: ['tab1.page.scss']
 })
 export class Tab1Page implements OnInit {
-  modelType: string = 'movie'; // Deklarasi modelType dengan nilai default
-  initializeSliderContainer: any[] = []; // Inisialisasi sebagai array
+  modelType: string = 'movie';
+  initializeSliderContainer: any[] = [];
   swiperContainerId: string = 'swiper-container';
-  genreContainerList: any = [];
-  page: number = 1; // Inisialisasi page dengan nilai default
-  genreSelectedValue: any = []; // Deklarasi genreSelectedValue
-  filteredGenreId: string = ''; // Inisialisasi filteredGenreId dengan nilai default
-  appCardContainer: any = [];
+  genreContainerList: any[] = [];
+  page: number = 1;
+  genreSelectedValue: any = [];
+  filteredGenreId: string = '';
+  appCardContainer: any[] = [];
+  loadingCurrentEventData: any;
 
   constructor(private service: ThemoviedbService) {}
 
   ngOnInit(): void {
-    this.loadTrendingMovies(); // Memperbaiki nama fungsi agar lebih deskriptif
+    this.loadTrendingMovies();
     this.initializeGenreContainer();
-    this.initializePopularContainer();
+    this.loadPopularMovies();
   }
 
   loadTrendingMovies() {
@@ -47,7 +47,6 @@ export class Tab1Page implements OnInit {
   }
 
   sliderClickEventTrigger(modelValue: any) {
-    // Tambahkan logika untuk menangani klik slider di sini
     console.log('Slider clicked:', modelValue);
   }
 
@@ -65,9 +64,9 @@ export class Tab1Page implements OnInit {
   initializeGenreContainer() {
     this.service.getGenreList(this.modelType).subscribe(
       (genreEl: any) => {
-        if (genreEl && genreEl.genres) { // Mengubah dari genre menjadi genres
-          console.log('Genres obtained:', genreEl.genres); // Tambahkan log ini
-          genreEl.genres.forEach((genreElement: any) => { // Mengubah dari genre menjadi genres
+        if (genreEl && genreEl.genres) {
+          console.log('Genres obtained:', genreEl.genres);
+          genreEl.genres.forEach((genreElement: any) => {
             this.genreContainerList.push(genreElement);
           });
         } else {
@@ -80,9 +79,7 @@ export class Tab1Page implements OnInit {
     );
   }
 
-  initializePopularContainer() {
-    this.page= 1;
-    this.filteredGenreId = '';
+  loadPopularMovies() {
     this.service.getPopularList(this.modelType, this.page, this.filteredGenreId).subscribe(
       (popularMoviesEl: any) => {
         popularMoviesEl.results.forEach((element: any) => {
@@ -93,43 +90,40 @@ export class Tab1Page implements OnInit {
             description: element.overview,
             release: element.release_date,
             image: posterUrl,
-            voterRating: element.voter_average,
+            voterRating: element.vote_average,
             modelItem: element
           });
         });
+
+        if (this.page > 1 && this.loadingCurrentEventData) {
+          this.loadingCurrentEventData.target.complete();
+          if (popularMoviesEl.results.length === 0) {
+            this.loadingCurrentEventData.target.disabled = true;
+          }
+        }
       },
       (error: any) => {
         console.error('Error fetching popular movies:', error);
+        if (this.page > 1 && this.loadingCurrentEventData) {
+          this.loadingCurrentEventData.target.complete();
+        }
       }
     );
   }
 
   genreSelectionChanged(event: any) {
-    this.genreSelectedValue = event.detail.value;
-    // Tambahkan logika tambahan yang diperlukan untuk menangani perubahan genre di sini
+    const genreEl = event.detail.value;
+    if (genreEl.length > 0 || this.filteredGenreId != null) {
+      this.page = 1;
+      this.appCardContainer = [];
+      this.filteredGenreId = genreEl.toString();
+      this.loadPopularMovies();
+    }
   }
 
-  loadData(event:any) {
-    this.page = this.page + 1;
-    this.service.getPopularList(this.modelType, this.page, this.filteredGenreId).subscribe(
-      (popularMoviesEl: any) => {
-        popularMoviesEl.results.forEach((element: any) => {
-          const posterUrl = `https://image.tmdb.org/t/p/w500${element.poster_path}`;
-          this.appCardContainer.push({
-            id: element.id,
-            title: element.title,
-            description: element.overview,
-            release: element.release_date,
-            image: posterUrl,
-            voterRating: element.voter_average,
-            modelItem: element
-    });
-   });
-   event.target.complete();
-   if (popularMoviesEl.results.lenght == 0) {
-    event.target.disabled = true;
-   }
-
-  });
+  loadData(event: any) {
+    this.page += 1;
+    this.loadingCurrentEventData = event;
+    this.loadPopularMovies();
   }
-} 
+}

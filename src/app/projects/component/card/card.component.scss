@@ -1,14 +1,49 @@
+.card {
+    border: 1px solid #e0e0e0; /* Memberikan border yang halus */
+    border-radius: 8px; /* Membuat sudut yang membulat */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Memberikan efek bayangan */
+    overflow: hidden; /* Menyembunyikan overflow dari konten */
+    background-color: #ffffff; /* Warna latar belakang putih */
+    transition: transform 0.3s, box-shadow 0.3s; /* Animasi transisi untuk efek hover */
+    position: relative; /* Untuk mengatur posisi badge */
+    padding: 16px; /* Menambahkan padding di sekitar card */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.card:hover {
+    transform: translateY(-10px); /* Mengangkat card sedikit saat di-hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Menambah efek bayangan saat di-hover */
+}
+
+.badge {
+    position: absolute; /* Mengatur posisi absolute untuk badge */
+    top: 16px; /* Jarak dari atas */
+    right: 16px; /* Jarak dari kanan */
+    background-color: #0051ff; /* Warna latar belakang badge */
+    color: #ffffff; /* Warna teks badge */
+    border-radius: 12px; /* Membuat sudut yang membulat */
+    padding: 4px 8px; /* Menambahkan padding dalam badge */
+    font-size: 14px; /* Mengatur ukuran font badge */
+    font-weight: bold; /* Membuat teks badge tebal */
+}
+
 .text-content {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 16px;
+    color: #333333; /* Warna teks yang lebih gelap untuk kontras */
+    margin-top: 12px; /* Menambahkan jarak atas untuk teks */
+    text-align: center; /* Mengatur teks agar rata tengah */
 }
 
-.poster-image {
+ion-img {
     width: 100%;
     height: auto;
     aspect-ratio: 2 / 3; /* Sesuaikan rasio aspek sesuai dengan ukuran poster */
     object-fit: cover;
-  }
-  
+    border-radius: 8px; /* Membuat sudut yang membulat untuk gambar */
+}
