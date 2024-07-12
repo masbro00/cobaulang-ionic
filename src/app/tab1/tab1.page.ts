@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { ThemoviedbService } from '../projects/api/service/themoviedb.service';
+import { ModelPageComponent } from '../projects/component/model-page/model-page.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-tab1',
@@ -16,8 +19,12 @@ export class Tab1Page implements OnInit {
   filteredGenreId: string = '';
   appCardContainer: any[] = [];
   loadingCurrentEventData: any;
+  currentModal: any[] = []; // Array untuk melacak modal yang sedang ditampilkan
 
-  constructor(private service: ThemoviedbService) {}
+  constructor(
+    private service: ThemoviedbService,
+    private modalController: ModalController
+  ) {}
 
   ngOnInit(): void {
     this.loadTrendingMovies();
@@ -90,7 +97,7 @@ export class Tab1Page implements OnInit {
             description: element.overview,
             release: element.release_date,
             image: posterUrl,
-            voterRating: element.vote_average,
+            voterRating: element.vote_average.toFixed(1),
             modelItem: element
           });
         });
@@ -125,5 +132,42 @@ export class Tab1Page implements OnInit {
     this.page += 1;
     this.loadingCurrentEventData = event;
     this.loadPopularMovies();
+  }
+
+  async presentModal() {
+    const modal = await this.modalController.create({
+      component: ModelPageComponent,
+      componentProps: {
+        title: 'Modal Title' // Tentukan judul modal jika diperlukan
+      }
+    });
+    await modal.present();
+    this.currentModal.push(modal); // Tambahkan modal ke array currentModal
+  }
+
+  async dismissModal() {
+    if (this.currentModal.length > 0) {
+      const modal = this.currentModal.pop(); // Ambil modal terbaru dari array
+      await modal.dismiss(); // Tutup modal
+    }
+  }
+
+  cardEventListener(modelItem: any) {
+    forkJoin({
+      detailResponse: this.service.getDetailList(this.modelType, modelItem.id),
+      creditResponse: this.service.getCreditsList(this.modelType, modelItem.id),
+      videoResponse: this.service.getVideoList(this.modelType, modelItem.id)
+    }).subscribe({
+      next: response => {
+        modelItem.detailResponse = response.detailResponse;
+        modelItem.creditResponse = response.creditResponse;
+        modelItem.videos = response.videoResponse;
+        this.presentModal(); // Panggil presentModal setelah mendapatkan data
+      },
+      error: err => {
+        console.error('Error fetching data', err);
+        // Tangani kesalahan di sini
+      }
+    });
   }
 }

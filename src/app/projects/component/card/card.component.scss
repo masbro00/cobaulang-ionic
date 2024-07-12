@@ -19,15 +19,14 @@
 }
 
 .badge {
-    position: absolute; /* Mengatur posisi absolute untuk badge */
-    top: 16px; /* Jarak dari atas */
-    right: 16px; /* Jarak dari kanan */
     background-color: #0051ff; /* Warna latar belakang badge */
     color: #ffffff; /* Warna teks badge */
     border-radius: 12px; /* Membuat sudut yang membulat */
     padding: 4px 8px; /* Menambahkan padding dalam badge */
     font-size: 14px; /* Mengatur ukuran font badge */
     font-weight: bold; /* Membuat teks badge tebal */
+    margin-top: 8px; /* Menambahkan jarak atas untuk badge */
+    text-align: center; /* Mengatur teks agar rata tengah */
 }
 
 .text-content {

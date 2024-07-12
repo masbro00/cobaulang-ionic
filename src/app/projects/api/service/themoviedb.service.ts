@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.prod';
+import { ModelPageComponent } from '../../component/model-page/model-page.component';
 
 @Injectable({
   providedIn: 'root'
@@ -48,4 +49,6 @@ export class ThemoviedbService {
     const requestURL = `${this.baseURL}/${type}/${id}/recommendations?${this.apiKey}&${this.language}`;
     return this.http.get(requestURL);
   }
+
 }
+  
