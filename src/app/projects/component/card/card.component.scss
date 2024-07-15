@@ -11,14 +11,14 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-
-.card:hover {
+  }
+  
+  .card:hover {
     transform: translateY(-10px); /* Mengangkat card sedikit saat di-hover */
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Menambah efek bayangan saat di-hover */
-}
-
-.badge {
+  }
+  
+  .badge {
     background-color: #0051ff; /* Warna latar belakang badge */
     color: #ffffff; /* Warna teks badge */
     border-radius: 12px; /* Membuat sudut yang membulat */
@@ -27,9 +27,9 @@
     font-weight: bold; /* Membuat teks badge tebal */
     margin-top: 8px; /* Menambahkan jarak atas untuk badge */
     text-align: center; /* Mengatur teks agar rata tengah */
-}
-
-.text-content {
+  }
+  
+  .text-content {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -37,12 +37,14 @@
     color: #333333; /* Warna teks yang lebih gelap untuk kontras */
     margin-top: 12px; /* Menambahkan jarak atas untuk teks */
     text-align: center; /* Mengatur teks agar rata tengah */
-}
-
-ion-img {
+    width: 100%; /* Memastikan lebar teks menyesuaikan dengan card */
+  }
+  
+  ion-img {
     width: 100%;
     height: auto;
     aspect-ratio: 2 / 3; /* Sesuaikan rasio aspek sesuai dengan ukuran poster */
     object-fit: cover;
     border-radius: 8px; /* Membuat sudut yang membulat untuk gambar */
-}
+  }
+  

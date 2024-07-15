@@ -50,5 +50,9 @@ export class ThemoviedbService {
     return this.http.get(requestURL);
   }
 
+  getReleaseDates(movieId: string): Observable<any> {
+    const url = `${this.baseURL}/movie/${movieId}/release_dates?${this.apiKey}&${this.language}`;
+    return this.http.get(url);
+  }
 }
   

@@ -37,13 +37,16 @@ export class Tab1Page implements OnInit {
       (trendingMoviesEl: any) => {
         trendingMoviesEl.results.forEach((trendingMovie: any) => {
           const posterUrl = `https://image.tmdb.org/t/p/w500${trendingMovie.poster_path}`;
-          this.initializeSliderContainer.push({
-            id: trendingMovie.id,
-            title: trendingMovie.title,
-            release: trendingMovie.release_date,
-            image: posterUrl,
-            posterPath: posterUrl,
-            modelItem: trendingMovie
+          this.service.getReleaseDates(trendingMovie.id).subscribe((releaseData: any) => {
+            const releaseYear = this.extractReleaseYear(releaseData);
+            this.initializeSliderContainer.push({
+              id: trendingMovie.id,
+              title: trendingMovie.title,
+              releaseYear: releaseYear, // Perbaiki konsistensi nama variabel
+              image: posterUrl,
+              posterPath: posterUrl,
+              modelItem: trendingMovie
+            });
           });
         });
       },
@@ -52,6 +55,7 @@ export class Tab1Page implements OnInit {
       }
     );
   }
+  
 
   sliderClickEventTrigger(modelValue: any) {
     console.log('Slider clicked:', modelValue);
@@ -91,17 +95,20 @@ export class Tab1Page implements OnInit {
       (popularMoviesEl: any) => {
         popularMoviesEl.results.forEach((element: any) => {
           const posterUrl = `https://image.tmdb.org/t/p/w500${element.poster_path}`;
-          this.appCardContainer.push({
-            id: element.id,
-            title: element.title,
-            description: element.overview,
-            release: element.release_date,
-            image: posterUrl,
-            voterRating: element.vote_average.toFixed(1),
-            modelItem: element
+          this.service.getReleaseDates(element.id).subscribe(releaseData => {
+            const releaseYear = this.extractReleaseYear(releaseData);
+            this.appCardContainer.push({
+              id: element.id,
+              title: element.title,
+              description: element.overview,
+              releaseYear: releaseYear, // Pastikan ini diatur
+              image: posterUrl,
+              voterRating: element.vote_average.toFixed(1),
+              modelItem: element
+            });
           });
         });
-
+  
         if (this.page > 1 && this.loadingCurrentEventData) {
           this.loadingCurrentEventData.target.complete();
           if (popularMoviesEl.results.length === 0) {
@@ -117,6 +124,22 @@ export class Tab1Page implements OnInit {
       }
     );
   }
+  
+  
+  
+
+  extractReleaseYear(releaseData: any): string {
+    console.log('Release data:', releaseData); // Log untuk melihat data yang diterima
+    if (releaseData && releaseData.results) {
+      const idRelease = releaseData.results.find((release: any) => release.iso_3166_1 === 'ID');
+      if (idRelease && idRelease.release_dates && idRelease.release_dates.length > 0) {
+        const releaseDate = new Date(idRelease.release_dates[0].release_date);
+        return releaseDate.getFullYear().toString();
+      }
+    }
+    return 'N/A';
+  }
+  
 
   genreSelectionChanged(event: any) {
     const genreEl = event.detail.value;

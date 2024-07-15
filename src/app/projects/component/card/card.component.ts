@@ -10,7 +10,7 @@ export class CardComponent implements OnInit {
   @Input() image: string = ''; // Memberikan nilai default
   @Input() voterRating: string = ''; // Memberikan nilai default
   @Input() model: any = {}; // Memberikan nilai default
-  @Input() year: number = new Date().getFullYear();
+  @Input() releaseYear: string = ''; // Memberikan nilai default
   @Output() cardEventTrigger: EventEmitter<any> = new EventEmitter();
 
   constructor() {}
