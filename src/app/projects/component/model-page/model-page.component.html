@@ -2,11 +2,65 @@
   <ion-toolbar>
     <ion-title>{{ title }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="closeModel()">Close</ion-button>
+      <ion-button (click)="closeModal()">Close</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content fullscreen class="ion-padding">
-  <!-- Isi konten modal di sini -->
+<ion-content fullscreen>
+  <ion-progress-bar *ngIf="isLoading" type="indeterminate"></ion-progress-bar>
+
+  <div>
+    <ion-img [src]="backgroundImage"></ion-img>
+  </div>
+
+  <div class="ion-margin-start">
+    <ion-toolbar>
+      <h3>{{ title }}</h3>
+      <ion-buttons slot="primary">
+        <ion-button color="secondary">
+          <ion-icon style="font-size: 40px;" name="play-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </div>
+
+  <!-- Pemeran (Cast) -->
+  <div *ngIf="castItemList.length > 0">
+    <ion-list>
+      <ion-list-header>
+        <h3>Pemeran</h3>
+      </ion-list-header>
+      <ion-item *ngFor="let castItem of castItemList">
+        <ion-avatar slot="start">
+          <img *ngIf="castItem.profile_path" [src]="castItem.profile_path" alt="Actor Profile">
+          <ion-icon *ngIf="!castItem.profile_path" style="font-size: 48px;" name="person"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ castItem.name }}</h2>
+          <h3>{{ castItem.character }}</h3>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <!-- Kru (Crew) -->
+  <div *ngIf="crewItemList.length > 0">
+    <ion-list>
+      <ion-list-header>
+        <h3>Kru</h3>
+      </ion-list-header>
+      <ion-item *ngFor="let crewItem of crewItemList">
+        <ion-avatar slot="start">
+          <img *ngIf="crewItem.profile_path" [src]="crewItem.profile_path" alt="Crew Profile">
+          <ion-icon *ngIf="!crewItem.profile_path" style="font-size: 48px;" name="person"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ crewItem.name }}</h2>
+          <h3>{{ crewItem.department }}</h3>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+
 </ion-content>

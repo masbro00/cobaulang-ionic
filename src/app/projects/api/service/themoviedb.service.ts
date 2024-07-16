@@ -12,6 +12,7 @@ export class ThemoviedbService {
   private baseURL: string = 'https://api.themoviedb.org/3';
   private language: string = 'language=id-ID';
   private country: string = 'with_origin_country=ID';
+  currentModal: any[] = [];
 
   constructor(private http: HttpClient) {}
 
@@ -55,4 +56,7 @@ export class ThemoviedbService {
     return this.http.get(url);
   }
 }
+
+
+
   

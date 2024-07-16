@@ -16,10 +16,8 @@
     <ion-grid fixed="true">
       <div>
         <ion-list>
-          <ion-item>
-            <ion-label>Pencarian Film by Genre</ion-label>
-            <ion-icon style="font-size: 24px;" name="filter"></ion-icon>
-            <ion-select placeholder="Pilih" [value]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)" multiple>
+          <ion-item class="ion-item">
+            <ion-select label="Pencarian Film by Genre" placeholder="Pilih" [value]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)" multiple>
               <ion-select-option *ngFor="let genre of genreContainerList" [value]="genre.id">{{genre.name}}</ion-select-option>
             </ion-select>
           </ion-item>  

@@ -18,6 +18,6 @@ export class CardComponent implements OnInit {
   ngOnInit() {}
 
   cardClickEventTrigger(model: any) {
-    this.cardEventTrigger.emit(model);
+    this.cardEventTrigger.emit(model)
   }
 }

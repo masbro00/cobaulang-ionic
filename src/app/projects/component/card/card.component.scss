@@ -1,9 +1,9 @@
 .card {
-    border: 1px solid #e0e0e0; /* Memberikan border yang halus */
+    border: 1px solid rgba(255,255,255, 0.1); /* Memberikan border yang halus */
     border-radius: 8px; /* Membuat sudut yang membulat */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Memberikan efek bayangan */
     overflow: hidden; /* Menyembunyikan overflow dari konten */
-    background-color: #ffffff; /* Warna latar belakang putih */
+    background-color: rgba(255, 255, 255, 0.05); /* Warna latar belakang putih */
     transition: transform 0.3s, box-shadow 0.3s; /* Animasi transisi untuk efek hover */
     position: relative; /* Untuk mengatur posisi badge */
     padding: 16px; /* Menambahkan padding di sekitar card */
@@ -34,7 +34,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 16px;
-    color: #333333; /* Warna teks yang lebih gelap untuk kontras */
+    color: #ffffff; /* Warna teks yang lebih gelap untuk kontras */
     margin-top: 12px; /* Menambahkan jarak atas untuk teks */
     text-align: center; /* Mengatur teks agar rata tengah */
     width: 100%; /* Memastikan lebar teks menyesuaikan dengan card */

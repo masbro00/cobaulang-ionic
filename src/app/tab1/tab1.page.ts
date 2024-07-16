@@ -42,7 +42,7 @@ export class Tab1Page implements OnInit {
             this.initializeSliderContainer.push({
               id: trendingMovie.id,
               title: trendingMovie.title,
-              releaseYear: releaseYear, // Perbaiki konsistensi nama variabel
+              releaseYear: releaseYear,
               image: posterUrl,
               posterPath: posterUrl,
               modelItem: trendingMovie
@@ -55,7 +55,6 @@ export class Tab1Page implements OnInit {
       }
     );
   }
-  
 
   sliderClickEventTrigger(modelValue: any) {
     console.log('Slider clicked:', modelValue);
@@ -101,14 +100,14 @@ export class Tab1Page implements OnInit {
               id: element.id,
               title: element.title,
               description: element.overview,
-              releaseYear: releaseYear, // Pastikan ini diatur
+              releaseYear: releaseYear,
               image: posterUrl,
               voterRating: element.vote_average.toFixed(1),
               modelItem: element
             });
           });
         });
-  
+
         if (this.page > 1 && this.loadingCurrentEventData) {
           this.loadingCurrentEventData.target.complete();
           if (popularMoviesEl.results.length === 0) {
@@ -124,9 +123,6 @@ export class Tab1Page implements OnInit {
       }
     );
   }
-  
-  
-  
 
   extractReleaseYear(releaseData: any): string {
     console.log('Release data:', releaseData); // Log untuk melihat data yang diterima
@@ -139,7 +135,6 @@ export class Tab1Page implements OnInit {
     }
     return 'N/A';
   }
-  
 
   genreSelectionChanged(event: any) {
     const genreEl = event.detail.value;
@@ -157,11 +152,12 @@ export class Tab1Page implements OnInit {
     this.loadPopularMovies();
   }
 
-  async presentModal() {
+  async presentModal(modelItem: any) {
     const modal = await this.modalController.create({
       component: ModelPageComponent,
       componentProps: {
-        title: 'Modal Title' // Tentukan judul modal jika diperlukan
+        modelItemList: modelItem,
+        modelType: this.modelType
       }
     });
     await modal.present();
@@ -182,10 +178,10 @@ export class Tab1Page implements OnInit {
       videoResponse: this.service.getVideoList(this.modelType, modelItem.id)
     }).subscribe({
       next: response => {
-        modelItem.detailResponse = response.detailResponse;
-        modelItem.creditResponse = response.creditResponse;
+        modelItem.detailResponseEl = response.detailResponse;
+        modelItem.creditsResponseEl = response.creditResponse;
         modelItem.videos = response.videoResponse;
-        this.presentModal(); // Panggil presentModal setelah mendapatkan data
+        this.presentModal(modelItem); // Panggil presentModal setelah mendapatkan data
       },
       error: err => {
         console.error('Error fetching data', err);
