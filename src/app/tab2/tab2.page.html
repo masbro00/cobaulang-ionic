@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons class="ion-margin-start" slot="start">
-      <ion-icon style="font-size: 48px;"name="recording"></ion-icon>
+      <ion-icon style="font-size: 48px;" name="tv"></ion-icon>
     </ion-buttons>
     <ion-title>
       Acara TV
@@ -10,7 +10,42 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  
+  <ion-list>
+    <app-slider [swiperContainerId]="'swiper-container'" [sliderInputValue]="initializeSliderContainer" (itemClicked)="cardEventListener($event)"></app-slider>
+    <ion-grid fixed="true">
+      <div>
+        <ion-list>
+          <ion-item class="ion-item">
+            <ion-select label="Cari Genre" placeholder="Pilih" [value]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)" multiple>
+              <ion-select-option *ngFor="let genre of genreContainerList" [value]="genre.id">{{genre.name}}</ion-select-option>
+            </ion-select>
+          </ion-item>
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+          <ion-item>
+            <ion-label style="font-size: 18px;">Acara TV Populer</ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+
+      <ion-row>
+        <ion-col size="6" size-md="4" size-lg="3" *ngFor="let item of appCardContainer">
+          <app-card 
+            [title]="item.title" 
+            [image]="item.image" 
+            [model]="item.modelItem" 
+            [voterRating]="item.voterRating" 
+            [releaseYear]="item.releaseYear"
+            (cardEventTrigger)="cardEventListener($event)">
+          </app-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+      <ion-infinite-scroll-content
+        loadingSpinner="bubbles"
+        loadingText="Loading more data...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ion-list>
 </ion-content>

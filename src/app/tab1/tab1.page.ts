@@ -36,17 +36,23 @@ export class Tab1Page implements OnInit {
     this.service.getTrendingList(this.modelType).subscribe(
       (trendingMoviesEl: any) => {
         trendingMoviesEl.results.forEach((trendingMovie: any) => {
-          const posterUrl = `https://image.tmdb.org/t/p/w500${trendingMovie.poster_path}`;
           this.service.getReleaseDates(trendingMovie.id).subscribe((releaseData: any) => {
-            const releaseYear = this.extractReleaseYear(releaseData);
-            this.initializeSliderContainer.push({
-              id: trendingMovie.id,
-              title: trendingMovie.title,
-              releaseYear: releaseYear,
-              image: posterUrl,
-              posterPath: posterUrl,
-              modelItem: trendingMovie
-            });
+            if (this.isIndonesianMovie(releaseData)) {
+              const posterUrl = `https://image.tmdb.org/t/p/w500${trendingMovie.poster_path}`;
+              if (posterUrl) { // Ensure posterUrl is not empty
+                const releaseYear = this.extractReleaseYear(releaseData);
+                this.initializeSliderContainer.push({
+                  id: trendingMovie.id,
+                  title: trendingMovie.title,
+                  releaseYear: releaseYear,
+                  image: posterUrl,
+                  posterPath: posterUrl,
+                  modelItem: trendingMovie
+                });
+              } else {
+                console.warn('Poster URL is empty for movie:', trendingMovie);
+              }
+            }
           });
         });
       },
@@ -93,18 +99,24 @@ export class Tab1Page implements OnInit {
     this.service.getPopularList(this.modelType, this.page, this.filteredGenreId).subscribe(
       (popularMoviesEl: any) => {
         popularMoviesEl.results.forEach((element: any) => {
-          const posterUrl = `https://image.tmdb.org/t/p/w500${element.poster_path}`;
           this.service.getReleaseDates(element.id).subscribe(releaseData => {
-            const releaseYear = this.extractReleaseYear(releaseData);
-            this.appCardContainer.push({
-              id: element.id,
-              title: element.title,
-              description: element.overview,
-              releaseYear: releaseYear,
-              image: posterUrl,
-              voterRating: element.vote_average.toFixed(1),
-              modelItem: element
-            });
+            if (this.isIndonesianMovie(releaseData)) {
+              const posterUrl = `https://image.tmdb.org/t/p/w500${element.poster_path}`;
+              if (posterUrl) { // Ensure posterUrl is not empty
+                const releaseYear = this.extractReleaseYear(releaseData);
+                this.appCardContainer.push({
+                  id: element.id,
+                  title: element.title,
+                  description: element.overview,
+                  releaseYear: releaseYear,
+                  image: posterUrl,
+                  voterRating: this.formatRating(element.vote_average),
+                  modelItem: element
+                });
+              } else {
+                console.warn('Poster URL is empty for movie:', element);
+              }
+            }
           });
         });
 
@@ -124,8 +136,15 @@ export class Tab1Page implements OnInit {
     );
   }
 
+  isIndonesianMovie(releaseData: any): boolean {
+    if (releaseData && releaseData.results) {
+      const idRelease = releaseData.results.find((release: any) => release.iso_3166_1 === 'ID');
+      return !!idRelease;
+    }
+    return false;
+  }
+
   extractReleaseYear(releaseData: any): string {
-    console.log('Release data:', releaseData); // Log untuk melihat data yang diterima
     if (releaseData && releaseData.results) {
       const idRelease = releaseData.results.find((release: any) => release.iso_3166_1 === 'ID');
       if (idRelease && idRelease.release_dates && idRelease.release_dates.length > 0) {
@@ -134,6 +153,10 @@ export class Tab1Page implements OnInit {
       }
     }
     return 'N/A';
+  }
+
+  formatRating(voteAverage: number): string {
+    return `${(voteAverage * 1).toFixed(1)}`;
   }
 
   genreSelectionChanged(event: any) {

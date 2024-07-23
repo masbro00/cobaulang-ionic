@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild, ElementRef, Input } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, ElementRef, Input, Output, EventEmitter} from '@angular/core';
 import Swiper from 'swiper';
 
 @Component({
@@ -12,6 +12,7 @@ export class SwiperComponent implements AfterViewInit {
   index = 0;
   slidePerView = 1;
 
+  @Output() itemClicked: EventEmitter<any> = new EventEmitter<any>(); 
   @ViewChild('swiperContainer', { static: false }) swiperContainer!: ElementRef;
 
   constructor() {}
@@ -25,20 +26,16 @@ export class SwiperComponent implements AfterViewInit {
     this.initializeSwiper();
   }
 
-  initializeSwiper(): any {
+  initializeSwiper(): void {
     if (this.swiperContainer && this.swiperContainer.nativeElement) {
       const swiper = new Swiper(this.swiperContainer.nativeElement, {
-        slidesPerView: this.slidePerView,
-        // navigation: {
-        //   nextEl: '.swiper-button-next',
-        //   prevEl: '.swiper-button-prev',
-        // },
+        slidesPerView: 1,
         pagination: {
           el: '.swiper-pagination',
           clickable: true,
         },
-        breakpoints:{
-          768:{
+        breakpoints: {
+          768: {
             slidesPerView: 2
           }
         }
@@ -49,9 +46,10 @@ export class SwiperComponent implements AfterViewInit {
   }
 
   sliderClickEventTrigger(modelItem: any): void {
-    // Implement your logic here
-    console.log('Slider item clicked:', modelItem);
+    this.itemClicked.emit(modelItem);
+    console.log('Slider item clicked:', modelItem); // Debugging log
   }
+
 
   changeSlide(prevOrNext: number): void {
     if (this.swiperContainer && this.swiperContainer.nativeElement && this.swiperContainer.nativeElement.swiper) {
@@ -63,4 +61,5 @@ export class SwiperComponent implements AfterViewInit {
       }
     }
   }
+  
 }

@@ -4,14 +4,14 @@
       <ion-icon style="font-size: 48px;" name="recording"></ion-icon>
     </ion-buttons>
     <ion-title>
-      Movies
+      Film
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-list>
-    <app-slider [sliderInputValue]="initializeSliderContainer"></app-slider>
+    <app-slider [sliderInputValue]="initializeSliderContainer" (sliderEventTrigger)="cardEventListener($event)"></app-slider>
 
     <ion-grid fixed="true">
       <div>
