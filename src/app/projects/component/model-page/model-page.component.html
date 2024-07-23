@@ -2,15 +2,13 @@
   <ion-toolbar class="custom-toolbar">
     <ion-title>{{ title }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="closeModal()" class="close-button">
-        <ion-icon name="close-outline"></ion-icon>
-      </ion-button>
+      <ion-button (click)="closeModal()">Close</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="modal-content">
-  <ion-progress-bar *ngIf="isLoading" type="indeterminate" class="progress-bar"></ion-progress-bar>
+<ion-content fullscreen class="fullscreen-modal">
+  <ion-progress-bar *ngIf="isLoading" type="indeterminate"></ion-progress-bar>
 
   <div class="media-container">
     <ion-img [src]="backgroundImage" *ngIf="!isVideoEnabled"></ion-img>
@@ -19,77 +17,77 @@
     </div>
   </div>
 
-  <ion-toolbar class="info-toolbar">
-    <h3>{{ title }}</h3>
-    <ion-buttons slot="end" *ngIf="!isVideoEnabled && videoUrl">
-      <ion-button color="primary" (click)="playVideo()">
-        <ion-icon name="play-outline"></ion-icon>
-        Play
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+  <div class="ion-padding">
+    <ion-toolbar class="custom-toolbar">
+      <h3>{{ title }}</h3>
+      <ion-buttons slot="primary" (click)="playVideo()" *ngIf="!isVideoEnabled && videoUrl">
+        <ion-button color="secondary">
+          <ion-icon name="play-outline"></ion-icon>
+          Play
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
 
-  <div class="info-chips">
-    <ion-chip color="primary" outline>Tanggal rilis: {{ releasedate }}</ion-chip>
-    <ion-chip color="primary" outline>Durasi: {{ runtime }}</ion-chip>
-    <ion-chip color="primary" outline>{{ voterRating }}</ion-chip>
-  </div>
+    <ion-toolbar class="info-toolbar">
+      <ion-chip color="dark" outline>Tanggal rilis: {{ releasedate }}</ion-chip>
+      <ion-chip color="dark" outline>Durasi: {{ runtime }}</ion-chip>
+      <ion-chip color="dark" outline>{{ voterRating }}</ion-chip>
+    </ion-toolbar>
 
-  <div class="overview-section">
-    <p>{{ overview }}</p>
-  </div>
+    <div class="overview-section">
+      <h4>Overview</h4>
+      <p>{{ overview }}</p>
+    </div>
 
-  <div *ngIf="castItemList.length > 0" class="list-section">
-    <ion-list>
-      <ion-list-header>
-        <h3>Pemeran</h3>
-      </ion-list-header>
-      <ion-item *ngFor="let castItem of castItemList" class="list-item">
-        <ion-avatar slot="start">
-          <img *ngIf="castItem.profile_path" [src]="castItem.profile_path" alt="Actor Profile">
-          <ion-icon *ngIf="!castItem.profile_path" name="person"></ion-icon>
-        </ion-avatar>
-        <ion-label>
-          <h2>{{ castItem.name }}</h2>
-          <h3>{{ castItem.character }}</h3>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </div>
+    <!-- Pemeran (Cast) -->
+    <div *ngIf="castItemList.length > 0" class="cast-crew-section">
+      <h4 class="section-title">Pemeran</h4>
+      <ion-list>
+        <ion-item *ngFor="let castItem of castItemList">
+          <ion-avatar slot="start">
+            <img *ngIf="castItem.profile_path" [src]="castItem.profile_path" alt="Actor Profile">
+            <ion-icon *ngIf="!castItem.profile_path" name="person" style="font-size: 48px;"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ castItem.name }}</h2>
+            <h3>{{ castItem.character }}</h3>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
 
-  <div *ngIf="crewItemList.length > 0" class="list-section">
-    <ion-list>
-      <ion-list-header>
-        <h3>Kru</h3>
-      </ion-list-header>
-      <ion-item *ngFor="let crewItem of crewItemList" class="list-item">
-        <ion-avatar slot="start">
-          <img *ngIf="crewItem.profile_path" [src]="crewItem.profile_path" alt="Crew Profile">
-          <ion-icon *ngIf="!crewItem.profile_path" name="person"></ion-icon>
-        </ion-avatar>
-        <ion-label>
-          <h2>{{ crewItem.name }}</h2>
-          <h3>{{ crewItem.job }}</h3>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </div>
+    <!-- Kru (Crew) -->
+    <div *ngIf="crewItemList.length > 0" class="cast-crew-section">
+      <h4 class="section-title">Kru</h4>
+      <ion-list>
+        <ion-item *ngFor="let crewItem of crewItemList">
+          <ion-avatar slot="start">
+            <img *ngIf="crewItem.profile_path" [src]="crewItem.profile_path" alt="Crew Profile">
+            <ion-icon *ngIf="!crewItem.profile_path" name="person" style="font-size: 48px;"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ crewItem.name }}</h2>
+            <h3>{{ crewItem.job }}</h3>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
 
-  <div *ngIf="appRecomendationsContainer.length > 0" class="list-section">
-    <ion-list>
-      <ion-list-header>
-        <h3>Rekomendasi</h3>
-      </ion-list-header>
-      <ion-item *ngFor="let recommendItem of appRecomendationsContainer">
-        <ion-thumbnail slot="start">
-          <img [src]="recommendItem.image" alt="Recommendation Image">
-        </ion-thumbnail>
-        <ion-label (click)="cardEventListener(recommendItem.modelItem)">
-          <h2>{{ recommendItem.title }}</h2>
-          <h3>{{ recommendItem.releaseYear }}</h3>
-          <p>{{ recommendItem.voterRating }}</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
+    <!-- Rekomendasi -->
+    <div *ngIf="appRecomendationsContainer.length > 0" class="recommendations-section">
+      <h4>Rekomendasi</h4>
+      <ion-list>
+        <ion-item *ngFor="let recommendItem of appRecomendationsContainer" (click)="cardEventListener(recommendItem.modelItem)">
+          <ion-thumbnail slot="start">
+            <img [src]="recommendItem.image" alt="Recommendation Image">
+          </ion-thumbnail>
+          <ion-label>
+            <h2>{{ recommendItem.title }}</h2>
+            <h3>{{ recommendItem.releaseYear }}</h3>
+            <p>{{ recommendItem.voterRating }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
   </div>
 </ion-content>
