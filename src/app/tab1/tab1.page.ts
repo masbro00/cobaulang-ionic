@@ -19,7 +19,7 @@ export class Tab1Page implements OnInit {
   filteredGenreId: string = '';
   appCardContainer: any[] = [];
   loadingCurrentEventData: any;
-  currentModal: any[] = []; // Array untuk melacak modal yang sedang ditampilkan
+  currentModal: any[] = [];
 
   constructor(
     private service: ThemoviedbService,
@@ -39,7 +39,7 @@ export class Tab1Page implements OnInit {
           this.service.getReleaseDates(trendingMovie.id).subscribe((releaseData: any) => {
             if (this.isIndonesianMovie(releaseData)) {
               const posterUrl = `https://image.tmdb.org/t/p/w500${trendingMovie.poster_path}`;
-              if (posterUrl) { // Ensure posterUrl is not empty
+              if (posterUrl) {
                 const releaseYear = this.extractReleaseYear(releaseData);
                 this.initializeSliderContainer.push({
                   id: trendingMovie.id,
@@ -62,9 +62,10 @@ export class Tab1Page implements OnInit {
     );
   }
 
-  sliderClickEventTrigger(modelValue: any) {
-    console.log('Slider clicked:', modelValue);
-  }
+ sliderClickEventTrigger(modelItem: any) {
+  console.log('Slider item clicked:', modelItem);
+  this.cardEventListener(modelItem); // Pastikan ini dipanggil
+}
 
   changeSlide(prevOrNext: number): void {
     const swiperContainer = document.getElementById(this.swiperContainerId) as any;
@@ -102,7 +103,7 @@ export class Tab1Page implements OnInit {
           this.service.getReleaseDates(element.id).subscribe(releaseData => {
             if (this.isIndonesianMovie(releaseData)) {
               const posterUrl = `https://image.tmdb.org/t/p/w500${element.poster_path}`;
-              if (posterUrl) { // Ensure posterUrl is not empty
+              if (posterUrl) {
                 const releaseYear = this.extractReleaseYear(releaseData);
                 this.appCardContainer.push({
                   id: element.id,
@@ -176,6 +177,7 @@ export class Tab1Page implements OnInit {
   }
 
   async presentModal(modelItem: any) {
+    console.log('Presenting modal for:', modelItem); // Pastikan ini dipanggil
     const modal = await this.modalController.create({
       component: ModelPageComponent,
       componentProps: {
@@ -184,17 +186,18 @@ export class Tab1Page implements OnInit {
       }
     });
     await modal.present();
-    this.currentModal.push(modal); // Tambahkan modal ke array currentModal
+    this.currentModal.push(modal);
   }
 
   async dismissModal() {
     if (this.currentModal.length > 0) {
-      const modal = this.currentModal.pop(); // Ambil modal terbaru dari array
-      await modal.dismiss(); // Tutup modal
+      const modal = this.currentModal.pop();
+      await modal.dismiss();
     }
   }
 
   cardEventListener(modelItem: any) {
+    console.log('Card event listener triggered for:', modelItem);
     forkJoin({
       detailResponse: this.service.getDetailList(this.modelType, modelItem.id),
       creditResponse: this.service.getCreditsList(this.modelType, modelItem.id),
@@ -204,12 +207,12 @@ export class Tab1Page implements OnInit {
         modelItem.detailResponseEl = response.detailResponse;
         modelItem.creditsResponseEl = response.creditResponse;
         modelItem.videos = response.videoResponse;
-        this.presentModal(modelItem); // Panggil presentModal setelah mendapatkan data
+        console.log('Data fetched for modal:', modelItem);
+        this.presentModal(modelItem); // Pastikan ini dipanggil
       },
       error: err => {
         console.error('Error fetching data', err);
-        // Tangani kesalahan di sini
       }
     });
   }
-}
+}  

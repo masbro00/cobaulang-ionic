@@ -32,7 +32,26 @@
 @import 'swiper/scss/pagination';
 // @import 'swiper/scss/bundle';
 
-
+/* Di dalam global.scss atau styles.scss */
+.fullscreen-modal {
+    ion-modal {
+      --height: 100vh !important;
+      --width: 100vw !important;
+      --max-height: 100vh !important;
+      --max-width: 100vw !important;
+      --border-radius: 0 !important;
+      --box-shadow: none !important;
+    }
+  
+    .modal-wrapper {
+      height: 100vh !important;
+      width: 100vw !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+  }
+  
 
 
 

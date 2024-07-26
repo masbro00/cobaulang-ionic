@@ -17,7 +17,7 @@
     </div>
   </div>
 
-  <div class="ion-padding">
+  <div class="content-padding">
     <ion-toolbar class="custom-toolbar">
       <h3>{{ title }}</h3>
       <ion-buttons slot="primary" (click)="playVideo()" *ngIf="!isVideoEnabled && videoUrl">
@@ -29,9 +29,15 @@
     </ion-toolbar>
 
     <ion-toolbar class="info-toolbar">
-      <ion-chip color="dark" outline>Tanggal rilis: {{ releasedate }}</ion-chip>
-      <ion-chip color="dark" outline>Durasi: {{ runtime }}</ion-chip>
-      <ion-chip color="dark" outline>{{ voterRating }}</ion-chip>
+      <ion-chip color="light" outline>
+        Tanggal rilis: {{ releasedate }}
+      </ion-chip>
+      <ion-chip color="light" outline>
+        Durasi: {{ runtime || 'N/A' }}
+      </ion-chip>
+      <ion-chip color="light" outline>
+        Penilaian: {{ voterRating || 'N/A' }}
+      </ion-chip>
     </ion-toolbar>
 
     <div class="overview-section">
@@ -42,52 +48,56 @@
     <!-- Pemeran (Cast) -->
     <div *ngIf="castItemList.length > 0" class="cast-crew-section">
       <h4 class="section-title">Pemeran</h4>
-      <ion-list>
-        <ion-item *ngFor="let castItem of castItemList">
-          <ion-avatar slot="start">
-            <img *ngIf="castItem.profile_path" [src]="castItem.profile_path" alt="Actor Profile">
-            <ion-icon *ngIf="!castItem.profile_path" name="person" style="font-size: 48px;"></ion-icon>
-          </ion-avatar>
-          <ion-label>
-            <h2>{{ castItem.name }}</h2>
-            <h3>{{ castItem.character }}</h3>
-          </ion-label>
-        </ion-item>
-      </ion-list>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" size-md="4" size-lg="3" *ngFor="let castItem of castItemList">
+            <ion-card class="profile-card">
+              <ion-img [src]="castItem.profile_path ? castItem.profile_path : 'assets/img/person-icon.png'" alt="Actor Profile"></ion-img>
+              <ion-card-content>
+                <h2>{{ castItem.name }}</h2>
+                <p>{{ castItem.character }}</p>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </div>
 
     <!-- Kru (Crew) -->
     <div *ngIf="crewItemList.length > 0" class="cast-crew-section">
       <h4 class="section-title">Kru</h4>
-      <ion-list>
-        <ion-item *ngFor="let crewItem of crewItemList">
-          <ion-avatar slot="start">
-            <img *ngIf="crewItem.profile_path" [src]="crewItem.profile_path" alt="Crew Profile">
-            <ion-icon *ngIf="!crewItem.profile_path" name="person" style="font-size: 48px;"></ion-icon>
-          </ion-avatar>
-          <ion-label>
-            <h2>{{ crewItem.name }}</h2>
-            <h3>{{ crewItem.job }}</h3>
-          </ion-label>
-        </ion-item>
-      </ion-list>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" size-md="4" size-lg="3" *ngFor="let crewItem of crewItemList">
+            <ion-card class="profile-card">
+              <ion-img [src]="crewItem.profile_path ? crewItem.profile_path : 'assets/img/person-icon.png'" alt="Crew Profile"></ion-img>
+              <ion-card-content>
+                <h2>{{ crewItem.name }}</h2>
+                <p>{{ crewItem.job }}</p>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </div>
 
     <!-- Rekomendasi -->
     <div *ngIf="appRecomendationsContainer.length > 0" class="recommendations-section">
       <h4>Rekomendasi</h4>
-      <ion-list>
-        <ion-item *ngFor="let recommendItem of appRecomendationsContainer" (click)="cardEventListener(recommendItem.modelItem)">
-          <ion-thumbnail slot="start">
-            <img [src]="recommendItem.image" alt="Recommendation Image">
-          </ion-thumbnail>
-          <ion-label>
-            <h2>{{ recommendItem.title }}</h2>
-            <h3>{{ recommendItem.releaseYear }}</h3>
-            <p>{{ recommendItem.voterRating }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" size-md="4" size-lg="3" *ngFor="let recommendItem of appRecomendationsContainer">
+            <ion-card class="recommendation-card" (click)="cardEventListener(recommendItem.modelItem)">
+              <ion-img [src]="recommendItem.image ? recommendItem.image : 'assets/img/no-image.png'" alt="Recommendation Image"></ion-img>
+              <ion-card-content>
+                <h2>{{ recommendItem.title }}</h2>
+                <p>{{ recommendItem.releaseYear }}</p>
+                <p>{{ recommendItem.voterRating }}</p>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </div>
   </div>
 </ion-content>

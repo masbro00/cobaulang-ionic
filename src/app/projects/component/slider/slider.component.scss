@@ -1,7 +1,10 @@
 .swiper-container {
   width: 100%;
   height: auto;
+  margin: 0 auto; /* Pusatkan kontainer */
+  max-width: 1200px; /* Batasi lebar kontainer pada layar yang lebih besar */
 }
+
 .swiper-slide {
   display: flex;
   flex-direction: column;
@@ -9,52 +12,73 @@
   justify-content: center;
   text-align: center;
   height: 100%; /* Pastikan slide mengambil tinggi penuh dari kontainer */
-  padding: 1px; /* Tambahkan padding jika diperlukan untuk menghindari terpotong */
+  padding: 10px; /* Tambahkan padding jika diperlukan untuk menghindari terpotong */
   box-sizing: border-box; /* Termasuk padding dalam perhitungan ukuran */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Tambahkan transisi untuk animasi halus */
 }
-.poster-image-container{
-  width: 100%;
 
+.swiper-slide:hover {
+  transform: scale(1.05); /* Efek zoom saat hover */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* Tambahkan bayangan saat hover */
 }
+
+.poster {
+  width: 100%; /* Pastikan poster mengambil lebar penuh */
+  max-width: 300px; /* Batasi lebar maksimum poster */
+  border-radius: 15px; /* Tambahkan border-radius untuk efek rounded */
+  overflow: hidden; /* Pastikan gambar tidak terpotong */
+  background: #fff; /* Tambahkan background putih */
+  transition: transform 0.3s ease; /* Tambahkan transisi untuk animasi halus */
+}
+
+.poster:hover {
+  transform: scale(1.03); /* Efek zoom saat hover pada poster */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Tambahkan bayangan saat hover pada poster */
+}
+
+.poster-image-container {
+  width: 100%;
+  height: 450px; /* Tetapkan tinggi tetap untuk poster */
+  overflow: hidden; /* Pastikan gambar tidak terpotong */
+}
+
 .poster-image {
   width: 100%;
+  height: 100%;
   background-size: cover;
-  background-position: 50% 50%;
-  // height: auto; /* Gunakan auto untuk menjaga rasio aspek */
-  // max-width: 100%; /* Batasi lebar maksimum gambar agar tidak terlalu besar */
-  // max-height: 80vh; /* Batasi tinggi maksimum gambar agar tidak terlalu besar */
-  // margin-bottom: 10px; /* Sesuaikan margin-bottom jika diperlukan */
-  // object-fit: cover; /* Pastikan gambar tetap proporsional dalam ruang yang diberikan */
+  background-position: center;
+  object-fit: cover; /* Pastikan gambar tetap proporsional dalam ruang yang diberikan */
+  transition: transform 0.3s ease; /* Tambahkan transisi untuk animasi halus */
 }
 
-
+.poster-image:hover {
+  transform: scale(1.1); /* Efek zoom saat hover pada gambar */
+}
 
 .text-content {
   font-size: 1.2em; /* Sesuaikan sesuai kebutuhan */
+  margin-top: 10px; /* Berikan jarak antara gambar dan teks */
+  color: #333; /* Warna teks yang lebih gelap untuk kontras */
+  font-weight: bold; /* Membuat teks lebih menonjol */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Tambahkan bayangan teks untuk efek 3D */
 }
 
 @media (min-width: 768px) {
   .swiper-container {
     max-width: 1200px; /* Batasi lebar kontainer pada layar yang lebih besar */
-    margin: 0 auto; /* Pusatkan kontainer */
   }
 
-  .poster-image-container{
-    width: auto;
-    height: calc(100vh - 113px);
-    overflow: hidden;
+  .poster {
+    max-width: 500px; /* Batasi lebar maksimum poster pada layar yang lebih besar */
   }
+
+  .poster-image-container {
+    height: 600px; /* Tetapkan tinggi tetap untuk poster pada layar yang lebih besar */
+  }
+
   .poster-image {
-    width: auto;
     height: 100%;
-    background-size: cover;
-    
-    // max-width: 100%; /* Batasi lebar maksimum gambar agar tidak terlalu besar */
-    // max-height: 70vh; /* Batasi tinggi maksimum gambar agar tidak terlalu besar pada layar yang lebih besar */
   }
-
-
-  
 
   .text-content {
     font-size: 1.5em; /* Sesuaikan sesuai kebutuhan */

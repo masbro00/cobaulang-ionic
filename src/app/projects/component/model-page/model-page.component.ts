@@ -1,8 +1,9 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, Renderer2, ElementRef } from '@angular/core';
 import { ModalController, Platform } from '@ionic/angular';
 import { ThemoviedbService } from '../../api/service/themoviedb.service';
-import { forkJoin } from 'rxjs';
+import { ThemoviedbTvShowService } from '../../api/service/themoviedb-tvshow.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-model-page',
@@ -11,7 +12,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class ModelPageComponent implements OnInit, OnChanges {
   @Input() modelItemList: any;
-  @Input() modelType: any;
+  @Input() modelType!: 'movie' | 'tv';
 
   isLoading: boolean = true;
   id: string = '';
@@ -21,7 +22,7 @@ export class ModelPageComponent implements OnInit, OnChanges {
   overview: string = '';
   castItemList: any[] = [];
   crewItemList: any[] = [];
-  runtime: string = '';
+  runtime: string = ''; // Untuk TV Show, Anda mungkin ingin menampilkan durasi per episode
   voterRating: any;
   appRecomendationsContainer: any[] = [];
   isVideoEnabled: boolean = false;
@@ -30,6 +31,7 @@ export class ModelPageComponent implements OnInit, OnChanges {
 
   constructor(
     private service: ThemoviedbService,
+    private tvShowService: ThemoviedbTvShowService,
     private sanitizer: DomSanitizer,
     private modalController: ModalController,
     private cdr: ChangeDetectorRef,
@@ -51,66 +53,68 @@ export class ModelPageComponent implements OnInit, OnChanges {
   initializeContainer() {
     if (this.modelItemList) {
       this.isLoading = true;
-  
+
       this.title = this.modelType === 'movie' ? this.modelItemList.detailResponseEl.title : this.modelItemList.detailResponseEl.original_name;
       this.id = this.modelItemList.detailResponseEl.id || '';
       this.backgroundImage = 'https://image.tmdb.org/t/p/w500/' + (this.modelItemList.detailResponseEl.backdrop_path || '');
-      
-      // Ensure overview is handled properly
+
       this.overview = this.modelItemList.detailResponseEl.overview ? this.modelItemList.detailResponseEl.overview : 'No overview available';
       console.log('Overview:', this.overview);
-  
-      this.releasedate = this.modelItemList.detailResponseEl.release_date || '';
-      this.runtime = (this.modelItemList.detailResponseEl.runtime || '') + ' Minutes';
+
+      this.releasedate = this.modelType === 'movie' ? this.modelItemList.detailResponseEl.release_date || '' : this.modelItemList.detailResponseEl.first_air_date || '';
+      
+      if (this.modelType === 'movie') {
+        this.runtime = (this.modelItemList.detailResponseEl.runtime || '') + ' Minutes';
+      } else if (this.modelType === 'tv') {
+        this.runtime = 'N/A'; // TV Show tidak memiliki durasi total
+      }
+
       this.voterRating = 'Penilaian: ' + (Number(this.modelItemList.detailResponseEl.vote_average * 10).toFixed(2)) + '%';
-  
-      this.castItemList = [];
-      this.crewItemList = [];
-  
-      if (this.modelItemList.creditsResponseEl && this.modelItemList.creditsResponseEl.cast) {
-        this.modelItemList.creditsResponseEl.cast.forEach((element: any) => {
-          if (element.profile_path) {
-            element.profile_path = 'https://image.tmdb.org/t/p/w138_and_h175_face/' + element.profile_path;
-          }
-          this.castItemList.push(element);
-        });
-      }
-  
-      if (this.modelItemList.creditsResponseEl && this.modelItemList.creditsResponseEl.crew) {
-        this.modelItemList.creditsResponseEl.crew.forEach((element: any) => {
-          if (element.profile_path) {
-            element.profile_path = 'https://image.tmdb.org/t/p/w138_and_h175_face/' + element.profile_path;
-          }
-          this.crewItemList.push(element);
-        });
-      }
-  
+
+      this.castItemList = this.modelItemList.creditsResponseEl?.cast.map((element: any) => ({
+        ...element,
+        profile_path: element.profile_path ? 'https://image.tmdb.org/t/p/w138_and_h175_face/' + element.profile_path : ''
+      })) || [];
+
+      this.crewItemList = this.modelItemList.creditsResponseEl?.crew.map((element: any) => ({
+        ...element,
+        profile_path: element.profile_path ? 'https://image.tmdb.org/t/p/w138_and_h175_face/' + element.profile_path : ''
+      })) || [];
+
       this.isLoading = false;
       this.cdr.detectChanges();
-  
+
       this.initializeRecomendationsContainer();
     }
-  
-    if (this.modelItemList && this.modelItemList.videos && this.modelItemList.videos.results.length > 0) {
+
+    if (this.modelItemList?.videos?.results?.length > 0) {
       this.dangerousVideoUrl = 'https://www.youtube.com/embed/' + this.modelItemList.videos.results[0].key;
       this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.dangerousVideoUrl);
     }
   }
 
   initializeRecomendationsContainer() {
-    this.service.getRecommendationList(this.modelType, this.id).subscribe(responseEl => {
-      this.appRecomendationsContainer = [];
-      responseEl.results.forEach((element: any) => {        
-        if (element.original_language === 'id') {
-          this.appRecomendationsContainer.push({
-            title: this.modelType === 'movie' ? element.title : element.original_name,
-            image: 'https://image.tmdb.org/t/p/w500/' + (element.backdrop_path || ''),
-            modelItem: element,
-            voterRating: 'Penilaian: ' + (Number(element.vote_average * 10).toFixed(2)) + '%',
-            releaseYear: element.release_date ? new Date(element.release_date).getFullYear() : ''
-          });
-        }
-      });
+    let recommendationService;
+    if (this.modelType === 'movie') {
+      recommendationService = this.service.getRecommendationList.bind(this.service, 'movie', this.id);
+    } else if (this.modelType === 'tv') {
+      recommendationService = this.tvShowService.getRecommendationList.bind(this.tvShowService, this.id);
+    } else {
+      console.error('modelType tidak valid');
+      this.isLoading = false;
+      return;
+    }
+
+    recommendationService().subscribe(responseEl => {
+      this.appRecomendationsContainer = responseEl.results
+        .filter((element: any) => element.original_language === 'id')
+        .map((element: any) => ({
+          title: this.modelType === 'movie' ? element.title : element.original_name,
+          image: 'https://image.tmdb.org/t/p/w500/' + (element.backdrop_path || ''),
+          modelItem: element,
+          voterRating: 'Penilaian: ' + (Number(element.vote_average * 10).toFixed(2)) + '%',
+          releaseYear: element.release_date ? new Date(element.release_date).getFullYear() : ''
+        }));
       this.isLoading = false;
       this.cdr.detectChanges();
     }, error => {
@@ -124,12 +128,17 @@ export class ModelPageComponent implements OnInit, OnChanges {
   }
 
   cardEventListener(modelItem: any) {
-    // no video playing in background
     this.isVideoEnabled = false;
     forkJoin({
-      detailResponse: this.service.getDetailList(this.modelType, modelItem.id),
-      creditResponse: this.service.getCreditsList(this.modelType, modelItem.id),
-      videoResponse: this.service.getVideoList(this.modelType, modelItem.id)
+      detailResponse: this.modelType === 'movie'
+        ? this.service.getDetailList('movie', modelItem.id)
+        : this.tvShowService.getDetailList(modelItem.id),
+      creditResponse: this.modelType === 'movie'
+        ? this.service.getCreditsList('movie', modelItem.id)
+        : this.tvShowService.getCreditsList(modelItem.id),
+      videoResponse: this.modelType === 'movie'
+        ? this.service.getVideoList('movie', modelItem.id)
+        : this.tvShowService.getVideoList(modelItem.id)
     }).subscribe({
       next: response => {
         modelItem.detailResponseEl = response.detailResponse;
@@ -148,11 +157,12 @@ export class ModelPageComponent implements OnInit, OnChanges {
       component: ModelPageComponent,
       componentProps: {
         modelItemList: modelItem,
-        modelType: this.modelType
+        modelType: this.modelType,
       },
-      cssClass: 'fullscreen-modal'
+      cssClass: 'fullscreen-modal',
+      backdropDismiss: false
     });
-
+    console.log(modal);
     await modal.present();
   }
 
