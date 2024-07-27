@@ -64,7 +64,7 @@ export class ModelPageComponent implements OnInit, OnChanges {
       this.releasedate = this.modelType === 'movie' ? this.modelItemList.detailResponseEl.release_date || '' : this.modelItemList.detailResponseEl.first_air_date || '';
       
       if (this.modelType === 'movie') {
-        this.runtime = (this.modelItemList.detailResponseEl.runtime || '') + ' Minutes';
+        this.runtime = (this.modelItemList.detailResponseEl.runtime || '') + ' Menit';
       } else if (this.modelType === 'tv') {
         this.runtime = 'N/A'; // TV Show tidak memiliki durasi total
       }
@@ -78,7 +78,8 @@ export class ModelPageComponent implements OnInit, OnChanges {
 
       this.crewItemList = this.modelItemList.creditsResponseEl?.crew.map((element: any) => ({
         ...element,
-        profile_path: element.profile_path ? 'https://image.tmdb.org/t/p/w138_and_h175_face/' + element.profile_path : ''
+        profile_path: element.profile_path ? 'https://image.tmdb.org/t/p/w138_and_h175_face/' + element.profile_path : '',
+        job: this.translateJob(element.job) // Menerjemahkan pekerjaan kru
       })) || [];
 
       this.isLoading = false;
@@ -121,6 +122,124 @@ export class ModelPageComponent implements OnInit, OnChanges {
       console.error('Error fetching recommendations:', error);
       this.isLoading = false;
     });
+  }
+
+  translateJob(job: string): string {
+    const jobTranslation: { [key: string]: string } = {
+      "Director": "Sutradara",
+      "Producer": "Produser",
+      "Creative Producer": "Produser Kreatif",
+      "Line Producer": "Lini Produser",
+      "Executive Producer": "Produser Eksekutif",
+      "Screenplay": "Skenario",
+      "Story": "Cerita",
+      "Writer": "Penulis",
+      "Cinematography": "Sinematografi",
+      "Director of Photography": "Sutradara Fotografi",
+      "Casting Director": "Sutradara Pemeranan",
+      "Editor": "Editor",
+      "Art Direction": "Arahan Seni",
+      "Set Decoration": "Dekorasi Set",
+      "Costume Design": "Desain Kostum",
+      "Costume Designer": "Perancang Kostum",
+      "Makeup Artist": "Penata Rias",
+      "Makeup & Hair": "Perias",
+      "Sound": "Suara",
+      "Original Music Composer": "Komponis",
+      "Sound Recordist": "Penanggung Jawab Suara",
+      "Sound Designer": "Perancang Suara",
+      "Visual Effects": "Efek Visual",
+      "Special Effects": "Efek Khusus",
+      "Casting": "Pemeran",
+      "Music": "Musik",
+      "Composer": "Komposer",
+      "Comic Book": "Pembuat Komik",
+      "Associate Producer": "Perancang Acara Madya",
+      "Character Designer": "Perancang Karakter",
+      "Concept Artist": "Perancang Ilustrasi",
+      "Special Effects Makeup Artist": "Penata Rias Efek",
+      "Visual Effects Supervisor": "Pengawas Efek Visual",
+      "Music Director": "Musik Direktur",
+      "First Assistant Director": "Asisten Sutradara",
+      "Post Production Coordinator": "Koordinator Pasca Produksi",
+      "Unit Production Manager": "Unit Manajer Produksi",
+      "Stunt Double" : "Pemeran Pengganti",
+      "Stunt Coordinator": "Koordinator Aksi",
+      "Action Director": "Sutradara Aksi",
+      "Fight Choreographer": "Koreografer Laga",
+      "Rigging Supervisor": "Pengawas Juru Ikat",
+      "Rigging Grip": "Juru Ikat",
+      "Assistant Art Director": "Asisten Direktur Seni",
+      "Assistant Set Decoration": "Asisten Dekorasi Set",
+      "Set Dresser": "Penata Set Baju",
+      "Property Master": "Master Properti",
+      "Property Buyer": "Pembeli Properti Dekor",
+      "Graphic Designer": "Desainer Grafis",
+      "Art Department Assistant": "Asisten Divisi Ilustrasi",
+      "On Set Props": "Pengawas Alat Peraga",
+      "Draughtsman": "Juru Gambar",
+      "Set Designer": "Perancang Set",
+      "Construction Manager": "Manajer Konstruksi",
+      "Conceptual Design": "Perancang Konsep",
+      "Camera Operator": "Operator Kamera",
+      "First Assistant B Camera" : "Asisten Kamera B",
+      "Steadicam Operator" : "Operator Kamera Tetap",
+      "Digital Imaging Technician": "Teknisi Gambar Digital",
+      "Still Photographer": "Juru Foto",
+      "BTS Videographer": "Perekam di Luar set",
+      "Creative Director": "Sutrada Kreatif",
+      "Production Coordinator": "Koordinator Produksi",
+      "Finance": "Keuangan",
+      "Production Assistant": "Asisten Produksi",
+      "Production Runner": "Penyiap Kebutuhan Set",
+      "Accountant": "Akuntan",
+      "Head Designer": "Kepala Desainer",
+      "Second Assistant Director": "Asisten Direktur",
+      "Second Second Assistant Director": "Asisten Direktur",
+      "Casting Associate": "Pencari Pemeran",
+      "Casting Assistant": "Asisten Kasting",
+      "Script Supervisor": "Pengawas Naskah",
+      "Continuity": "Editor Penyambungan",
+      "Clapper Loader": "Penyinkronan AudioVideo",
+      "Sound Assistant": "Asisten Audio",
+      "Assistant Gaffer": "Asisten Gaffer",
+      "Lighting Technician": "Teknisi Pencahayaan",
+      "Key Grip": "Kepala Pencahayaan",
+      "Best Boy Grip": "Asisten Pencahayaan",
+      "Assistant Grip": "Asisten Perkap Dekor",
+      "Location Manager": "Manajer Lokasi",
+      "Assistant Location Manager": "Asisten Manajer Lokasi",
+      "Costume Supervisor": "Pengawas Set Kostum",
+      "Assistant Costume Designer": "Asisten Desainer Kostum",
+      "Key Set Costumer": "Perancang Set Kostum",
+      "Seamstress": "Penjahit Kostum",
+      "Assistant Makeup Artist": "Asisten Makeup",
+      "Assistant Hairstylist": "Penata Rambut1",
+      "Additional Hairstylist": "Penata Rambut2",
+      "Data Management Technician": "Manajemen Data",
+      "Assistant Editor": "Asisten Editor",
+      "Translator": "Penerjemah",
+      "Sound Re-Recording Mixer": "Penanggung Jawab Audio",
+      "Dialogue Editor": "Dialog Editor",
+      "Sound Effects Editor": "Editor Efek Suara",
+      "ADR Mixer": "Pengulangan Rekaman",
+      "Sound Post Production Coordinator": "Koordinator Produksi Suara",
+      "Music Producer": "Produser Musik",
+      "Scoring Mixer": "Penggabungan Track Audio",
+      "Music Supervisor": "Pengawas Jalur Suara",
+      "Orchestrator": "Orkestra",
+      "Project Manager": "Manajer Projek",
+      "Visual Effects Producer": "Produser Efek Visual",
+      "VFX Production Coordinator": "Koordinator Efek Visual",
+      "Visual Development": "Pengembang Visual",
+      "VFX Editor": "Editor Efek Visual",
+      "Pipeline Technical Director": "Direktur Teknis",
+      "Compositing Lead": "Penggabung AudioVideo",
+
+      // Tambahkan terjemahan pekerjaan lain yang diperlukan di sini
+    };
+
+    return jobTranslation[job] || job;
   }
 
   async closeModal() {
