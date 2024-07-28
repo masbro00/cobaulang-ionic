@@ -15,7 +15,7 @@ export class Tab3Page {
   page: number = 1;
   searchCardContainer: any[] = [];
   loadingCurrentEventData: any;
-  isVideoEnabled: boolean = false;
+  currentModal: any[] = [];
 
   constructor(
     private movieService: ThemoviedbService,
@@ -44,10 +44,16 @@ export class Tab3Page {
           .map((element: any) => ({
             title: element.title || element.original_name || 'Unknown Title',
             image: 'https://image.tmdb.org/t/p/w500/' + (element.poster_path || ''),
-            modelItem: element,
+            modelItem: {
+              ...element,
+              media_type: element.media_type || (element.title ? 'movie' : 'tv') // Menambahkan media_type jika tidak ada
+            },
             voterRating: this.formatRating(element.vote_average || 0),
-            releaseYear: element.release_date ? new Date(element.release_date).getFullYear() : 'Unknown Year',
-            media_type: element.media_type || 'unknown',
+            releaseYear: element.release_date 
+              ? new Date(element.release_date).getFullYear() 
+              : element.first_air_date 
+                ? new Date(element.first_air_date).getFullYear() 
+                : 'Unknown Year',
             id: element.id || 'unknown'
           }));
 
@@ -82,7 +88,6 @@ export class Tab3Page {
       return;
     }
 
-    this.isVideoEnabled = false;
     if (modelItem.media_type === 'movie') {
       this.fetchMovieDetails(modelItem);
     } else if (modelItem.media_type === 'tv') {
@@ -99,10 +104,6 @@ export class Tab3Page {
       this.movieService.getVideoList('movie', modelItem.id)
     ]).subscribe({
       next: ([detailResponse, creditResponse, videoResponse]) => {
-        if (!detailResponse || !creditResponse || !videoResponse) {
-          console.error('Incomplete response data', { detailResponse, creditResponse, videoResponse });
-          return;
-        }
         const modalData = this.prepareModalData(modelItem, {
           detailResponse,
           creditResponse,
@@ -115,7 +116,7 @@ export class Tab3Page {
       }
     });
   }
-  
+
   private fetchTVDetails(modelItem: any) {
     forkJoin([
       this.tvShowService.getDetailList(modelItem.id),
@@ -123,10 +124,6 @@ export class Tab3Page {
       this.tvShowService.getVideoList(modelItem.id)
     ]).subscribe({
       next: ([detailResponse, creditResponse, videoResponse]) => {
-        if (!detailResponse || !creditResponse || !videoResponse) {
-          console.error('Incomplete response data', { detailResponse, creditResponse, videoResponse });
-          return;
-        }
         const modalData = this.prepareModalData(modelItem, {
           detailResponse,
           creditResponse,
@@ -147,11 +144,16 @@ export class Tab3Page {
       videoUrl: response.videoResponse?.results?.length > 0 
         ? `https://www.youtube.com/embed/${response.videoResponse.results[0].key}` 
         : '',
-      isVideoEnabled: this.isVideoEnabled,
-      releasedate: modelItem.release_date ? new Date(modelItem.release_date).toLocaleDateString() : 'Unknown Release Date',
+      releasedate: modelItem.release_date 
+        ? new Date(modelItem.release_date).toLocaleDateString() 
+        : modelItem.first_air_date 
+          ? new Date(modelItem.first_air_date).toLocaleDateString() 
+          : 'Unknown Release Date',
       runtime: response.detailResponse?.runtime 
         ? `${Math.floor(response.detailResponse.runtime / 60)}h ${response.detailResponse.runtime % 60}m` 
-        : 'Unknown Runtime',
+        : response.detailResponse?.episode_run_time 
+          ? `${Math.floor(response.detailResponse.episode_run_time[0] / 60)}h ${response.detailResponse.episode_run_time[0] % 60}m` 
+          : 'Unknown Runtime',
       voterRating: this.formatRating(modelItem.vote_average || 0),
       overview: modelItem.overview || 'No overview available',
       castItemList: response.creditResponse?.cast || [],

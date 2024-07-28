@@ -32,29 +32,10 @@ export class Tab1Page implements OnInit {
     this.loadPopularMovies();
   }
 
-  loadTrendingMovies() {
+  loadTrendingMovies(): void {
     this.service.getTrendingList(this.modelType).subscribe(
       (trendingMoviesEl: any) => {
-        trendingMoviesEl.results.forEach((trendingMovie: any) => {
-          this.service.getReleaseDates(trendingMovie.id).subscribe((releaseData: any) => {
-            if (this.isIndonesianMovie(releaseData)) {
-              const posterUrl = `https://image.tmdb.org/t/p/w500${trendingMovie.poster_path}`;
-              if (posterUrl) {
-                const releaseYear = this.extractReleaseYear(releaseData);
-                this.initializeSliderContainer.push({
-                  id: trendingMovie.id,
-                  title: trendingMovie.title,
-                  releaseYear: releaseYear,
-                  image: posterUrl,
-                  posterPath: posterUrl,
-                  modelItem: trendingMovie
-                });
-              } else {
-                console.warn('Poster URL is empty for movie:', trendingMovie);
-              }
-            }
-          });
-        });
+        this.filterAndDisplayMovies(trendingMoviesEl.results, 'initializeSliderContainer');
       },
       (error: any) => {
         console.error('Error fetching trending movies:', error);
@@ -62,79 +43,48 @@ export class Tab1Page implements OnInit {
     );
   }
 
- sliderClickEventTrigger(modelItem: any) {
-  console.log('Slider item clicked:', modelItem);
-  this.cardEventListener(modelItem); // Pastikan ini dipanggil
-}
-
-  changeSlide(prevOrNext: number): void {
-    const swiperContainer = document.getElementById(this.swiperContainerId) as any;
-    if (swiperContainer) {
-      if (prevOrNext === -1) {
-        swiperContainer.swiper.slidePrev();
-      } else {
-        swiperContainer.swiper.slideNext();
-      }
-    }
-  }
-
-  initializeGenreContainer() {
-    this.service.getGenreList(this.modelType).subscribe(
-      (genreEl: any) => {
-        if (genreEl && genreEl.genres) {
-          console.log('Genres obtained:', genreEl.genres);
-          genreEl.genres.forEach((genreElement: any) => {
-            this.genreContainerList.push(genreElement);
-          });
-        } else {
-          console.error('Invalid genre data:', genreEl);
-        }
-      },
-      (error: any) => {
-        console.error('Error fetching genres:', error);
-      }
-    );
-  }
-
-  loadPopularMovies() {
+  loadPopularMovies(): void {
     this.service.getPopularList(this.modelType, this.page, this.filteredGenreId).subscribe(
       (popularMoviesEl: any) => {
-        popularMoviesEl.results.forEach((element: any) => {
-          this.service.getReleaseDates(element.id).subscribe(releaseData => {
-            if (this.isIndonesianMovie(releaseData)) {
-              const posterUrl = `https://image.tmdb.org/t/p/w500${element.poster_path}`;
-              if (posterUrl) {
-                const releaseYear = this.extractReleaseYear(releaseData);
-                this.appCardContainer.push({
-                  id: element.id,
-                  title: element.title,
-                  description: element.overview,
-                  releaseYear: releaseYear,
-                  image: posterUrl,
-                  voterRating: this.formatRating(element.vote_average),
-                  modelItem: element
-                });
-              } else {
-                console.warn('Poster URL is empty for movie:', element);
-              }
-            }
-          });
-        });
-
-        if (this.page > 1 && this.loadingCurrentEventData) {
-          this.loadingCurrentEventData.target.complete();
-          if (popularMoviesEl.results.length === 0) {
-            this.loadingCurrentEventData.target.disabled = true;
-          }
-        }
+        this.filterAndDisplayMovies(popularMoviesEl.results, 'appCardContainer');
       },
       (error: any) => {
         console.error('Error fetching popular movies:', error);
-        if (this.page > 1 && this.loadingCurrentEventData) {
-          this.loadingCurrentEventData.target.complete();
-        }
       }
     );
+  }
+
+  filterAndDisplayMovies(movies: any[], container: string): void {
+    movies.forEach((movie: any) => {
+      this.service.getReleaseDates(movie.id).subscribe((releaseData: any) => {
+        if (this.isIndonesianMovie(releaseData) || this.isIndonesianLanguage(movie)) {
+          const posterUrl = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+          if (posterUrl) {
+            const releaseYear = this.extractReleaseYear(releaseData);
+            const movieData = {
+              id: movie.id,
+              title: movie.title,
+              releaseYear: releaseYear,
+              image: posterUrl,
+              posterPath: posterUrl,
+              modelItem: movie
+            };
+
+            if (container === 'initializeSliderContainer') {
+              this.initializeSliderContainer.push(movieData);
+            } else {
+              this.appCardContainer.push({
+                ...movieData,
+                description: movie.overview,
+                voterRating: this.formatRating(movie.vote_average)
+              });
+            }
+          } else {
+            console.warn('Poster URL is empty for movie:', movie);
+          }
+        }
+      });
+    });
   }
 
   isIndonesianMovie(releaseData: any): boolean {
@@ -143,6 +93,10 @@ export class Tab1Page implements OnInit {
       return !!idRelease;
     }
     return false;
+  }
+
+  isIndonesianLanguage(movie: any): boolean {
+    return movie.original_language === 'id';
   }
 
   extractReleaseYear(releaseData: any): string {
@@ -215,4 +169,38 @@ export class Tab1Page implements OnInit {
       }
     });
   }
-}  
+
+  changeSlide(prevOrNext: number): void {
+    const swiperContainer = document.getElementById(this.swiperContainerId) as any;
+    if (swiperContainer) {
+      if (prevOrNext === -1) {
+        swiperContainer.swiper.slidePrev();
+      } else {
+        swiperContainer.swiper.slideNext();
+      }
+    }
+  }
+
+  sliderClickEventTrigger(modelItem: any) {
+    console.log('Slider item clicked:', modelItem);
+    this.cardEventListener(modelItem); // Pastikan ini dipanggil
+  }
+
+  initializeGenreContainer() {
+    this.service.getGenreList(this.modelType).subscribe(
+      (genreEl: any) => {
+        if (genreEl && genreEl.genres) {
+          console.log('Genres obtained:', genreEl.genres);
+          genreEl.genres.forEach((genreElement: any) => {
+            this.genreContainerList.push(genreElement);
+          });
+        } else {
+          console.error('Invalid genre data:', genreEl);
+        }
+      },
+      (error: any) => {
+        console.error('Error fetching genres:', error);
+      }
+    );
+  }
+}

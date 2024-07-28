@@ -27,29 +27,56 @@ export class Tab2Page implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadTrendingTVShows();
+    this.loadLatestReleases();
     this.initializeGenreContainer();
     this.loadPopularTVShows();
   }
 
-  loadTrendingTVShows(): void {
-    this.tvShowService.getTrendingList().subscribe(
-      (trendingTVShows: any) => {
-        this.initializeSliderContainer = trendingTVShows.results
-          .filter((tvShow: any) => tvShow.origin_country && tvShow.origin_country.includes('ID'))
-          .map((tvShow: any) => ({
-            id: tvShow.id,
-            title: tvShow.name,
-            image: `https://image.tmdb.org/t/p/w500${tvShow.poster_path}`,
-            posterPath: `https://image.tmdb.org/t/p/w500${tvShow.poster_path}`,
-            releaseDate: tvShow.first_air_date,
-            runtime: tvShow.episode_run_time ? tvShow.episode_run_time[0] : 'Unknown'
-          }));
+  loadLatestReleases(): void {
+    this.tvShowService.getLatestReleases().subscribe(
+      (latestReleases: any) => {
+        console.log('Latest TV Releases:', latestReleases.results); // Log seluruh objek hasil tanpa filter
+
+        // Filter berdasarkan bahasa Indonesia dan country code ID
+        const filteredTVShows = latestReleases.results.filter((tvShow: any) => {
+          const isIndonesian = tvShow.original_language === 'id';
+          const originCountry = tvShow.origin_country && tvShow.origin_country.includes('ID');
+          return isIndonesian && originCountry;
+        });
+
+        console.log('Filtered TV Shows:', filteredTVShows); // Log TV shows yang difilter
+
+        this.initializeSliderContainer = filteredTVShows.map((tvShow: any) => ({
+          id: tvShow.id,
+          title: tvShow.name,
+          image: `https://image.tmdb.org/t/p/w500${tvShow.poster_path}`,
+          posterPath: `https://image.tmdb.org/t/p/w500${tvShow.poster_path}`,
+          releaseDate: tvShow.first_air_date,
+          runtime: tvShow.episode_run_time ? tvShow.episode_run_time[0] : 'Unknown'
+        }));
+
+        console.log('Slider Container:', this.initializeSliderContainer); // Log hasil akhir
       },
       (error: any) => {
-        console.error('Error fetching trending TV shows:', error);
+        console.error('Error fetching latest TV releases:', error);
       }
     );
+  }
+
+  sliderClickEventTrigger(modelItem: any) {
+    console.log('Slider item clicked:', modelItem);
+    this.cardEventListener(modelItem);
+  }
+
+  changeSlide(prevOrNext: number): void {
+    const swiperContainer = document.getElementById(this.swiperContainerId) as any;
+    if (swiperContainer) {
+      if (prevOrNext === -1) {
+        swiperContainer.swiper.slidePrev();
+      } else {
+        swiperContainer.swiper.slideNext();
+      }
+    }
   }
 
   initializeGenreContainer(): void {

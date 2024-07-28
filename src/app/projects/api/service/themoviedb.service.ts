@@ -59,5 +59,24 @@ export class ThemoviedbService {
     return this.http.get(requestURL);
   }
 
+  getUpcomingList(type: string, page: number = 1): Observable<any> {
+    const requestURL = `${this.baseURL}/${type}/upcoming?${this.apiKey}&${this.language}&page=${page}`;
+    return this.http.get(requestURL);
+  }
+
+  getNowPlayingList(type: string, page: number = 1): Observable<any> {
+    const requestURL = `${this.baseURL}/${type}/now_playing?${this.apiKey}&${this.language}&page=${page}`;
+    return this.http.get(requestURL);
+  }
+  
+  getTopRatedList(type: string, page: number = 1, genreId: string = ''): Observable<any> {
+    let url = `${this.baseURL}/${type}/top_rated?${this.apiKey}&${this.language}&page=${page}`;
+    if (genreId) {
+      url += `&with_genres=${genreId}`;
+    }
+    return this.http.get(url);
+  }  
+  
+
 
 }

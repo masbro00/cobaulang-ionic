@@ -20,14 +20,39 @@ export class ThemoviedbTvShowService {
   }
 
   getTrendingList(): Observable<any> {
-    const requestURL = `${this.baseURL}/trending/tv/week?${this.apiKey}&${this.language}`;
-    return this.http.get(requestURL);
+    const url = `${this.baseURL}/trending/tv/week?${this.apiKey}&${this.language}&${this.country}`;
+    console.log('API URL:', url); // Tambahkan log untuk memastikan URL API benar
+    return this.http.get<any>(url);
+  }
+  
+  getLatestReleases(): Observable<any> {
+    const today = new Date().toISOString().split('T')[0]; // Format tanggal hari ini sebagai YYYY-MM-DD
+    const url = `${this.baseURL}/discover/tv?${this.apiKey}&${this.language}&${this.country}&sort_by=first_air_date.desc&first_air_date.lte=${today}`;
+    console.log('API URL:', url); // Tambahkan log untuk memastikan URL API benar
+    return this.http.get<any>(url);
+  }
+  
+  getOnTheAir(): Observable<any> {
+    const url = `${this.baseURL}/tv/on_the_air?${this.apiKey}&${this.language}`;
+    console.log('API URL:', url); // Tambahkan log untuk memastikan URL API benar
+    return this.http.get<any>(url);
+  }  
+
+  getAiringToday(): Observable<any> {
+    const url = `${this.baseURL}/tv/airing_today?${this.apiKey}&${this.language}`;
+    console.log('API URL:', url); // Tambahkan log untuk memastikan URL API benar
+    return this.http.get<any>(url);
   }  
 
   getPopularList(page: number, genres: string): Observable<any> {
     const requestURL = `${this.baseURL}/discover/tv?${this.apiKey}&${this.language}&${this.country}&page=${page}&with_genres=${genres}`;
     return this.http.get(requestURL);
   }
+
+  getLatestList(page: number): Observable<any> {
+    const url = `${this.baseURL}/tv/airing_today?${this.apiKey}&${this.language}&page=${page}`;
+    return this.http.get(url);
+}
 
   getDetailList(id: string): Observable<any> {
     const requestURL = `${this.baseURL}/tv/${id}?${this.apiKey}&${this.language}`;
@@ -49,6 +74,11 @@ export class ThemoviedbTvShowService {
     return this.http.get(requestURL);
   }
 
+  getReleaseDates(id: string): Observable<any> {
+    const url = `${this.baseURL}/mtv/${id}/release_dates?${this.apiKey}`;
+    return this.http.get(url);
+  }
+
   getSeasonDetails(tvShowId: string, seasonNumber: number): Observable<any> {
     const requestURL = `${this.baseURL}/tv/${tvShowId}/season/${seasonNumber}?${this.apiKey}&${this.language}`;
     return this.http.get(requestURL);
@@ -64,4 +94,10 @@ export class ThemoviedbTvShowService {
     return this.http.get(requestURL);
   }
   
+  getTVShowDetails(tvShowId: number): Observable<any> {
+    const url = `${this.baseURL}/tv/${tvShowId}?${this.apiKey}&${this.language}`;
+    return this.http.get<any>(url);
+  }
+  
+
 }

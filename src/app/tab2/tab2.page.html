@@ -11,7 +11,8 @@
 
 <ion-content [fullscreen]="true">
   <ion-list>
-    <app-slider [swiperContainerId]="'swiper-container'" [sliderInputValue]="initializeSliderContainer" (itemClicked)="cardEventListener($event)"></app-slider>
+    <app-slider [sliderInputValue]="initializeSliderContainer" (itemClicked)="cardEventListener($event)"></app-slider>
+    
     <ion-grid fixed="true">
       <div>
         <ion-list>
