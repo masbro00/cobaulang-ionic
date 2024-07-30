@@ -56,7 +56,9 @@ export class ModelPageComponent implements OnInit, OnChanges {
 
       this.title = this.modelType === 'movie' ? this.modelItemList.detailResponseEl.title : this.modelItemList.detailResponseEl.original_name;
       this.id = this.modelItemList.detailResponseEl.id || '';
-      this.backgroundImage = 'https://image.tmdb.org/t/p/w500/' + (this.modelItemList.detailResponseEl.backdrop_path || '');
+      this.backgroundImage = this.modelItemList.detailResponseEl.backdrop_path
+        ? 'https://image.tmdb.org/t/p/w500/' + this.modelItemList.detailResponseEl.backdrop_path
+        : 'assets/img/bgnull.jpg';
 
       this.overview = this.modelItemList.detailResponseEl.overview ? this.modelItemList.detailResponseEl.overview : 'No overview available';
       console.log('Overview:', this.overview);
@@ -97,7 +99,7 @@ export class ModelPageComponent implements OnInit, OnChanges {
   initializeRecomendationsContainer() {
     let recommendationService;
     if (this.modelType === 'movie') {
-      recommendationService = this.service.getRecommendationList.bind(this.service, 'movie', this.id);
+      recommendationService = this.service.getRecommendationList.bind(this.service, this.id);
     } else if (this.modelType === 'tv') {
       recommendationService = this.tvShowService.getRecommendationList.bind(this.tvShowService, this.id);
     } else {
@@ -250,13 +252,13 @@ export class ModelPageComponent implements OnInit, OnChanges {
     this.isVideoEnabled = false;
     forkJoin({
       detailResponse: this.modelType === 'movie'
-        ? this.service.getDetailList('movie', modelItem.id)
+        ? this.service.getDetailList(modelItem.id)
         : this.tvShowService.getDetailList(modelItem.id),
       creditResponse: this.modelType === 'movie'
-        ? this.service.getCreditsList('movie', modelItem.id)
+        ? this.service.getCreditsList(modelItem.id)
         : this.tvShowService.getCreditsList(modelItem.id),
       videoResponse: this.modelType === 'movie'
-        ? this.service.getVideoList('movie', modelItem.id)
+        ? this.service.getVideoList(modelItem.id)
         : this.tvShowService.getVideoList(modelItem.id)
     }).subscribe({
       next: response => {

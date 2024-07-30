@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
 import { ThemoviedbService } from '../projects/api/service/themoviedb.service';
 import { ThemoviedbTvShowService } from '../projects/api/service/themoviedb-tvshow.service';
+import { ModalController } from '@ionic/angular';
 import { forkJoin } from 'rxjs';
 import { ModelPageComponent } from '../projects/component/model-page/model-page.component';
 
@@ -10,12 +10,13 @@ import { ModelPageComponent } from '../projects/component/model-page/model-page.
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss']
 })
-export class Tab3Page {
+export class Tab3Page implements OnInit {
   searchValue: string = '';
-  page: number = 1;
   searchCardContainer: any[] = [];
+  page: number = 1;
   loadingCurrentEventData: any;
   currentModal: any[] = [];
+  isMovieSearch: boolean = true; // Flag to toggle between movie and TV show search
 
   constructor(
     private movieService: ThemoviedbService,
@@ -23,152 +24,128 @@ export class Tab3Page {
     private modalController: ModalController
   ) {}
 
-  filterList() {
-    this.page = 1;
-    this.searchCardContainer = [];
+  ngOnInit(): void {
+    // Initial load can be implemented if required
+  }
 
-    if (this.searchValue.length > 2) {
-      this.loadSearchContainer();
+  filterList() {
+    if (this.searchValue.trim() !== '') {
+      this.page = 1;
+      this.searchCardContainer = [];
+      this.loadSearchResults();
     }
   }
 
-  loadSearchContainer() {
-    forkJoin([
-      this.movieService.getsearchMovies(this.searchValue, this.page),
-      this.tvShowService.getsearchTVShows(this.searchValue, this.page)
-    ]).subscribe({
-      next: ([movieResults, tvResults]) => {
-        const combinedResults = [...movieResults.results, ...tvResults.results];
-        this.searchCardContainer = combinedResults
-          .filter((element: any) => element.original_language === 'id')
-          .map((element: any) => ({
-            title: element.title || element.original_name || 'Unknown Title',
-            image: 'https://image.tmdb.org/t/p/w500/' + (element.poster_path || ''),
-            modelItem: {
-              ...element,
-              media_type: element.media_type || (element.title ? 'movie' : 'tv') // Menambahkan media_type jika tidak ada
-            },
-            voterRating: this.formatRating(element.vote_average || 0),
-            releaseYear: element.release_date 
-              ? new Date(element.release_date).getFullYear() 
-              : element.first_air_date 
-                ? new Date(element.first_air_date).getFullYear() 
-                : 'Unknown Year',
-            id: element.id || 'unknown'
+  loadSearchResults() {
+    if (this.isMovieSearch) {
+      this.movieService.getsearchMovies(this.searchValue, this.page).subscribe({
+        next: (response: any) => {
+          const filteredResults = response.results.filter((item: any) => {
+            return item.original_language === 'id' || (item.origin_country && item.origin_country.includes('ID'));
+          });
+
+          const formattedResults = filteredResults.map((item: any) => ({
+            id: item.id,
+            title: item.title || item.name,
+            image: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+            voterRating: item.vote_average.toFixed(1),
+            releaseYear: item.release_date ? new Date(item.release_date).getFullYear().toString() : 'Unknown',
+            modelItem: item
           }));
 
-        if (this.page > 1 && this.loadingCurrentEventData) {
-          this.loadingCurrentEventData.target.complete();
-          if (this.searchCardContainer.length === 0) {
-            this.loadingCurrentEventData.target.disabled = true;
+          this.searchCardContainer.push(...formattedResults);
+
+          if (this.page > 1 && this.loadingCurrentEventData) {
+            this.loadingCurrentEventData.target.complete();
+            if (response.results.length === 0) {
+              this.loadingCurrentEventData.target.disabled = true;
+            }
+          }
+        },
+        error: (error: any) => {
+          console.error('Error fetching movies:', error);
+          if (this.page > 1 && this.loadingCurrentEventData) {
+            this.loadingCurrentEventData.target.complete();
           }
         }
-      },
-      error: error => {
-        console.error('Error loading search container:', error);
-      }
-    });
+      });
+    } else {
+      this.tvShowService.getsearchTVShows(this.searchValue, this.page).subscribe({
+        next: (response: any) => {
+          const filteredResults = response.results.filter((item: any) => {
+            return item.original_language === 'id' || item.origin_country.includes('ID');
+          });
+
+          const formattedResults = filteredResults.map((item: any) => ({
+            id: item.id,
+            title: item.name || item.title,
+            image: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+            voterRating: item.vote_average.toFixed(1),
+            releaseYear: item.first_air_date ? new Date(item.first_air_date).getFullYear().toString() : 'Unknown',
+            modelItem: item
+          }));
+
+          this.searchCardContainer.push(...formattedResults);
+
+          if (this.page > 1 && this.loadingCurrentEventData) {
+            this.loadingCurrentEventData.target.complete();
+            if (response.results.length === 0) {
+              this.loadingCurrentEventData.target.disabled = true;
+            }
+          }
+        },
+        error: (error: any) => {
+          console.error('Error fetching TV shows:', error);
+          if (this.page > 1 && this.loadingCurrentEventData) {
+            this.loadingCurrentEventData.target.complete();
+          }
+        }
+      });
+    }
   }
 
-  formatRating(voteAverage: number): string {
-    return `${(voteAverage * 10).toFixed(1)}`;
+  async presentModal(modelItem: any) {
+    const modal = await this.modalController.create({
+      component: ModelPageComponent,
+      componentProps: {
+        modelItemList: modelItem,
+        modelType: this.isMovieSearch ? 'movie' : 'tv'
+      }
+    });
+    await modal.present();
+    this.currentModal.push(modal);
+  }
+
+  async dismissModal() {
+    if (this.currentModal.length > 0) {
+      const modal = this.currentModal.pop();
+      await modal.dismiss();
+    }
+  }
+
+  cardEventListener(modelItem: any) {
+    const service = this.isMovieSearch ? this.movieService : this.tvShowService;
+
+    forkJoin({
+      detailResponse: service.getDetailList(modelItem.id),
+      creditResponse: service.getCreditsList(modelItem.id),
+      videoResponse: service.getVideoList(modelItem.id)
+    }).subscribe({
+      next: (response) => {
+        modelItem.detailResponseEl = response.detailResponse;
+        modelItem.creditsResponseEl = response.creditResponse;
+        modelItem.videos = response.videoResponse;
+        this.presentModal(modelItem);
+      },
+      error: (err) => {
+        console.error('Error fetching data', err);
+      }
+    });
   }
 
   loadData(event: any) {
     this.page += 1;
     this.loadingCurrentEventData = event;
-    this.loadSearchContainer();
-  }
-
-  async cardEventListener(modelItem: any) {
-    console.log('Model Item:', modelItem);
-
-    if (!modelItem || !modelItem.media_type || !modelItem.id) {
-      console.error('Invalid media item:', modelItem);
-      return;
-    }
-
-    if (modelItem.media_type === 'movie') {
-      this.fetchMovieDetails(modelItem);
-    } else if (modelItem.media_type === 'tv') {
-      this.fetchTVDetails(modelItem);
-    } else {
-      console.error('Unknown media type:', modelItem.media_type);
-    }
-  }
-
-  private fetchMovieDetails(modelItem: any) {
-    forkJoin([
-      this.movieService.getDetailList('movie', modelItem.id),
-      this.movieService.getCreditsList('movie', modelItem.id),
-      this.movieService.getVideoList('movie', modelItem.id)
-    ]).subscribe({
-      next: ([detailResponse, creditResponse, videoResponse]) => {
-        const modalData = this.prepareModalData(modelItem, {
-          detailResponse,
-          creditResponse,
-          videoResponse
-        });
-        this.presentModal(modalData);
-      },
-      error: err => {
-        console.error('Error fetching movie data:', err);
-      }
-    });
-  }
-
-  private fetchTVDetails(modelItem: any) {
-    forkJoin([
-      this.tvShowService.getDetailList(modelItem.id),
-      this.tvShowService.getCreditsList(modelItem.id),
-      this.tvShowService.getVideoList(modelItem.id)
-    ]).subscribe({
-      next: ([detailResponse, creditResponse, videoResponse]) => {
-        const modalData = this.prepareModalData(modelItem, {
-          detailResponse,
-          creditResponse,
-          videoResponse
-        });
-        this.presentModal(modalData);
-      },
-      error: err => {
-        console.error('Error fetching TV data:', err);
-      }
-    });
-  }
-
-  private prepareModalData(modelItem: any, response: any) {
-    return {
-      title: modelItem.title || modelItem.original_name || 'Unknown Title',
-      backgroundImage: 'https://image.tmdb.org/t/p/w500/' + (modelItem.backdrop_path || 'default.jpg'),
-      videoUrl: response.videoResponse?.results?.length > 0 
-        ? `https://www.youtube.com/embed/${response.videoResponse.results[0].key}` 
-        : '',
-      releasedate: modelItem.release_date 
-        ? new Date(modelItem.release_date).toLocaleDateString() 
-        : modelItem.first_air_date 
-          ? new Date(modelItem.first_air_date).toLocaleDateString() 
-          : 'Unknown Release Date',
-      runtime: response.detailResponse?.runtime 
-        ? `${Math.floor(response.detailResponse.runtime / 60)}h ${response.detailResponse.runtime % 60}m` 
-        : response.detailResponse?.episode_run_time 
-          ? `${Math.floor(response.detailResponse.episode_run_time[0] / 60)}h ${response.detailResponse.episode_run_time[0] % 60}m` 
-          : 'Unknown Runtime',
-      voterRating: this.formatRating(modelItem.vote_average || 0),
-      overview: modelItem.overview || 'No overview available',
-      castItemList: response.creditResponse?.cast || [],
-      crewItemList: response.creditResponse?.crew || [],
-      appRecomendationsContainer: []
-    };
-  }
-
-  async presentModal(data: any) {
-    console.log('Presenting Modal with Data:', data);
-    const modal = await this.modalController.create({
-      component: ModelPageComponent,
-      componentProps: data,
-      cssClass: 'fullscreen-modal'
-    });
-    await modal.present();
+    this.loadSearchResults();
   }
 }

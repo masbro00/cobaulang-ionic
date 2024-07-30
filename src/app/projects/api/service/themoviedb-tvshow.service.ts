@@ -75,7 +75,7 @@ export class ThemoviedbTvShowService {
   }
 
   getReleaseDates(id: string): Observable<any> {
-    const url = `${this.baseURL}/mtv/${id}/release_dates?${this.apiKey}`;
+    const url = `${this.baseURL}/tv/${id}/release_dates?${this.apiKey}`;
     return this.http.get(url);
   }
 

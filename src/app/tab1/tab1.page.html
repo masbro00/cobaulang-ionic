@@ -13,7 +13,6 @@
   <ion-list>
     <app-slider [sliderInputValue]="initializeSliderContainer" (itemClicked)="cardEventListener($event)"></app-slider>
 
-
     <ion-grid fixed="true">
       <div>
         <ion-list>
@@ -24,7 +23,7 @@
           </ion-item>  
 
           <ion-item>
-            <ion-label style="font-size: 18px;">Film Populer</ion-label>
+            <ion-label style="font-size: 18px;">{{ genreLabel }}</ion-label>
           </ion-item>
         </ion-list>
       </div>
@@ -42,13 +41,5 @@
         </ion-col>
       </ion-row>
     </ion-grid>
-
-    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
-      <ion-infinite-scroll-content
-        loadingSpinner="bubbles"
-        loadingText="Loading more data...">
-      </ion-infinite-scroll-content>
-    </ion-infinite-scroll>
-
   </ion-list>
 </ion-content>

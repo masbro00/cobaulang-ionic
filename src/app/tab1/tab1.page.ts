@@ -11,15 +11,16 @@ import { forkJoin } from 'rxjs';
 })
 export class Tab1Page implements OnInit {
   modelType: string = 'movie';
-  initializeSliderContainer: any[] = [];
+  initializeSliderContainer: any[] = [];  // Untuk film di slider
   swiperContainerId: string = 'swiper-container';
   genreContainerList: any[] = [];
   page: number = 1;
   genreSelectedValue: any = [];
   filteredGenreId: string = '';
-  appCardContainer: any[] = [];
+  appCardContainer: any[] = [];  // Untuk film di card
   loadingCurrentEventData: any;
   currentModal: any[] = [];
+  genreLabel: string = 'Film Populer';
 
   constructor(
     private service: ThemoviedbService,
@@ -27,31 +28,36 @@ export class Tab1Page implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadTrendingMovies();
+    this.loadPopularMoviesForSlider(); // Memuat film populer untuk slider
     this.initializeGenreContainer();
     this.loadPopularMovies();
   }
 
-  loadTrendingMovies(): void {
-    this.service.getTrendingList(this.modelType).subscribe(
-      (trendingMoviesEl: any) => {
-        this.filterAndDisplayMovies(trendingMoviesEl.results, 'initializeSliderContainer');
+  loadPopularMoviesForSlider(): void {
+    this.service.getPopularList(this.page, this.filteredGenreId).subscribe(
+      (popularMoviesEl: any) => {
+        this.filterAndDisplayMovies(popularMoviesEl.results, 'initializeSliderContainer');
       },
       (error: any) => {
-        console.error('Error fetching trending movies:', error);
+        console.error('Error fetching popular movies for slider:', error);
       }
     );
   }
 
   loadPopularMovies(): void {
-    this.service.getPopularList(this.modelType, this.page, this.filteredGenreId).subscribe(
-      (popularMoviesEl: any) => {
+    this.service.getPopularList(this.page, this.filteredGenreId).subscribe({
+      next: (popularMoviesEl: any) => {
         this.filterAndDisplayMovies(popularMoviesEl.results, 'appCardContainer');
       },
-      (error: any) => {
+      error: (error: any) => {
         console.error('Error fetching popular movies:', error);
+      },
+      complete: () => {
+        if (this.loadingCurrentEventData && this.loadingCurrentEventData.target) {
+          this.loadingCurrentEventData.target.complete();
+        }
       }
-    );
+    });
   }
 
   filterAndDisplayMovies(movies: any[], container: string): void {
@@ -59,7 +65,7 @@ export class Tab1Page implements OnInit {
       this.service.getReleaseDates(movie.id).subscribe((releaseData: any) => {
         if (this.isIndonesianMovie(releaseData) || this.isIndonesianLanguage(movie)) {
           const posterUrl = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
-          if (posterUrl) {
+          if (posterUrl && movie.poster_path) {
             const releaseYear = this.extractReleaseYear(releaseData);
             const movieData = {
               id: movie.id,
@@ -115,12 +121,23 @@ export class Tab1Page implements OnInit {
   }
 
   genreSelectionChanged(event: any) {
-    const genreEl = event.detail.value;
-    if (genreEl.length > 0 || this.filteredGenreId != null) {
-      this.page = 1;
-      this.appCardContainer = [];
-      this.filteredGenreId = genreEl.toString();
-      this.loadPopularMovies();
+    this.genreSelectedValue = event.detail.value;
+    this.updateGenreLabel();
+    this.page = 1;
+    this.appCardContainer = [];
+    this.filteredGenreId = this.genreSelectedValue.toString();
+    this.loadPopularMovies();
+  }
+
+  updateGenreLabel() {
+    if (this.genreSelectedValue.length > 0) {
+      const selectedGenres = this.genreContainerList.filter(genre =>
+        this.genreSelectedValue.includes(genre.id)
+      );
+      const genreNames = selectedGenres.map(genre => genre.name);
+      this.genreLabel = genreNames.join(', ');
+    } else {
+      this.genreLabel = 'Film Populer';
     }
   }
 
@@ -131,7 +148,7 @@ export class Tab1Page implements OnInit {
   }
 
   async presentModal(modelItem: any) {
-    console.log('Presenting modal for:', modelItem); // Pastikan ini dipanggil
+    console.log('Presenting modal for:', modelItem);
     const modal = await this.modalController.create({
       component: ModelPageComponent,
       componentProps: {
@@ -153,18 +170,18 @@ export class Tab1Page implements OnInit {
   cardEventListener(modelItem: any) {
     console.log('Card event listener triggered for:', modelItem);
     forkJoin({
-      detailResponse: this.service.getDetailList(this.modelType, modelItem.id),
-      creditResponse: this.service.getCreditsList(this.modelType, modelItem.id),
-      videoResponse: this.service.getVideoList(this.modelType, modelItem.id)
+      detailResponse: this.service.getDetailList(modelItem.id),
+      creditResponse: this.service.getCreditsList(modelItem.id),
+      videoResponse: this.service.getVideoList(modelItem.id)
     }).subscribe({
-      next: response => {
+      next: (response) => {
         modelItem.detailResponseEl = response.detailResponse;
         modelItem.creditsResponseEl = response.creditResponse;
         modelItem.videos = response.videoResponse;
         console.log('Data fetched for modal:', modelItem);
-        this.presentModal(modelItem); // Pastikan ini dipanggil
+        this.presentModal(modelItem);
       },
-      error: err => {
+      error: (err) => {
         console.error('Error fetching data', err);
       }
     });
@@ -183,24 +200,22 @@ export class Tab1Page implements OnInit {
 
   sliderClickEventTrigger(modelItem: any) {
     console.log('Slider item clicked:', modelItem);
-    this.cardEventListener(modelItem); // Pastikan ini dipanggil
+    this.cardEventListener(modelItem);
   }
 
   initializeGenreContainer() {
-    this.service.getGenreList(this.modelType).subscribe(
-      (genreEl: any) => {
+    this.service.getGenreList().subscribe({
+      next: (genreEl: any) => {
         if (genreEl && genreEl.genres) {
           console.log('Genres obtained:', genreEl.genres);
-          genreEl.genres.forEach((genreElement: any) => {
-            this.genreContainerList.push(genreElement);
-          });
+          this.genreContainerList = genreEl.genres;
         } else {
           console.error('Invalid genre data:', genreEl);
         }
       },
-      (error: any) => {
+      error: (error: any) => {
         console.error('Error fetching genres:', error);
       }
-    );
+    });
   }
 }

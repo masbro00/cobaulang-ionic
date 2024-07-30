@@ -14,69 +14,78 @@ export class ThemoviedbService {
 
   constructor(private http: HttpClient) {}
 
-  getGenreList(type: string): Observable<any> {
-    const requestURL = `${this.baseURL}/genre/${type}/list?${this.apiKey}&${this.language}`;
+  getGenreList(): Observable<any> {
+    const requestURL = `${this.baseURL}/genre/movie/list?${this.apiKey}&${this.language}`;
+    console.log('API URL:', requestURL);
     return this.http.get(requestURL);
   }
 
-  getTrendingList(type: string): Observable<any> {
-    const requestURL = `${this.baseURL}/discover/movie?${this.apiKey}&${this.language}&${this.country}&sort_by=popularity.desc`;
-    return this.http.get(requestURL);
+  getTrendingList(): Observable<any> {
+    const url = `${this.baseURL}/trending/movie/week?${this.apiKey}&${this.language}&${this.country}`;
+    console.log('API URL:', url);
+    return this.http.get<any>(url);
   }
 
-  getPopularList(type: string, page: number, genres: string): Observable<any> {
+  getPopularList(page: number, genres: string): Observable<any> {
     const requestURL = `${this.baseURL}/discover/movie?${this.apiKey}&${this.language}&${this.country}&page=${page}&with_genres=${genres}`;
+    console.log('API URL:', requestURL);
     return this.http.get(requestURL);
   }
 
-  getDetailList(type: string, id: string): Observable<any> {
-    const requestURL = `${this.baseURL}/${type}/${id}?${this.apiKey}&${this.language}`;
+  getUpcomingList(page: number = 1): Observable<any> {
+    const requestURL = `${this.baseURL}/movie/upcoming?${this.apiKey}&${this.language}&page=${page}`;
+    console.log('API URL:', requestURL);
     return this.http.get(requestURL);
   }
 
-  getCreditsList(type: string, id: string): Observable<any> {
-    const requestURL = `${this.baseURL}/${type}/${id}/credits?${this.apiKey}`;
+  getNowPlayingList(page: number = 1): Observable<any> {
+    const requestURL = `${this.baseURL}/movie/now_playing?${this.apiKey}&${this.language}&page=${page}`;
+    console.log('API URL:', requestURL);
     return this.http.get(requestURL);
   }
 
-  getVideoList(type: string, id: string): Observable<any> {
-    const requestURL = `${this.baseURL}/${type}/${id}/videos?${this.apiKey}&${this.language}`;
+  getTopRatedList(page: number = 1, genreId: string = ''): Observable<any> {
+    let url = `${this.baseURL}/movie/top_rated?${this.apiKey}&${this.language}&page=${page}`;
+    if (genreId) {
+      url += `&with_genres=${genreId}`;
+    }
+    console.log('API URL:', url);
+    return this.http.get(url);
+  }
+
+  getDetailList(id: string): Observable<any> {
+    const requestURL = `${this.baseURL}/movie/${id}?${this.apiKey}&${this.language}`;
+    console.log('API URL:', requestURL);
     return this.http.get(requestURL);
   }
 
-  getRecommendationList(type: string, id: string): Observable<any> {
-    const requestURL = `${this.baseURL}/${type}/${id}/recommendations?${this.apiKey}&${this.language}&${this.country}`;
+  getCreditsList(id: string): Observable<any> {
+    const requestURL = `${this.baseURL}/movie/${id}/credits?${this.apiKey}`;
+    console.log('API URL:', requestURL);
     return this.http.get(requestURL);
   }
 
-  getReleaseDates(movieId: string): Observable<any> {
-    const url = `${this.baseURL}/movie/${movieId}/release_dates?${this.apiKey}`;
+  getVideoList(id: string): Observable<any> {
+    const requestURL = `${this.baseURL}/movie/${id}/videos?${this.apiKey}&${this.language}`;
+    console.log('API URL:', requestURL);
+    return this.http.get(requestURL);
+  }
+
+  getRecommendationList(id: string): Observable<any> {
+    const requestURL = `${this.baseURL}/movie/${id}/recommendations?${this.apiKey}&${this.language}&${this.country}`;
+    console.log('API URL:', requestURL);
+    return this.http.get(requestURL);
+  }
+
+  getReleaseDates(id: string): Observable<any> {
+    const url = `${this.baseURL}/movie/${id}/release_dates?${this.apiKey}`;
+    console.log('API URL:', url);
     return this.http.get(url);
   }
 
   getsearchMovies(query: string, page: number): Observable<any> {
     const requestURL = `${this.baseURL}/search/movie?${this.apiKey}&${this.language}&${this.country}&page=${page}&query=${query}`;
+    console.log('API URL:', requestURL);
     return this.http.get(requestURL);
   }
-
-  getUpcomingList(type: string, page: number = 1): Observable<any> {
-    const requestURL = `${this.baseURL}/${type}/upcoming?${this.apiKey}&${this.language}&page=${page}`;
-    return this.http.get(requestURL);
-  }
-
-  getNowPlayingList(type: string, page: number = 1): Observable<any> {
-    const requestURL = `${this.baseURL}/${type}/now_playing?${this.apiKey}&${this.language}&page=${page}`;
-    return this.http.get(requestURL);
-  }
-  
-  getTopRatedList(type: string, page: number = 1, genreId: string = ''): Observable<any> {
-    let url = `${this.baseURL}/${type}/top_rated?${this.apiKey}&${this.language}&page=${page}`;
-    if (genreId) {
-      url += `&with_genres=${genreId}`;
-    }
-    return this.http.get(url);
-  }  
-  
-
-
 }
