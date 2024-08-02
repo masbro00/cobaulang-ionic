@@ -1,4 +1,20 @@
-// .ion-select{
-//     display: flex;
-//     justify-content: space-between;
-// }
+.scrollable-genres {
+    white-space: nowrap;
+    overflow-x: auto;
+    padding: 0 16px;
+  
+    .genres-container {
+      display: inline-flex;
+      width: max-content;
+    }
+  
+    ion-button {
+      margin-right: 8px;
+      min-width: 100px; // Sesuaikan dengan kebutuhan
+    }
+  
+    ion-button.selected {
+      background-color: #f0f0f0; // Warna saat genre dipilih
+    }
+  }
+  

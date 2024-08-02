@@ -7,7 +7,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
-
+import { FormsModule } from '@angular/forms';
 // Import SafePipe from its file path
 import { SafePipe } from './projects/component/model-page/safe.pipe';// Sesuaikan path ini dengan lokasi SafePipe di aplikasi Anda
 
@@ -20,6 +20,7 @@ import { SafePipe } from './projects/component/model-page/safe.pipe';// Sesuaika
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
+    FormsModule,
     HttpClientModule
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],

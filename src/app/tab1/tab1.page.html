@@ -13,11 +13,12 @@
   <ion-list>
     <app-slider [sliderInputValue]="initializeSliderContainer" (itemClicked)="cardEventListener($event)"></app-slider>
 
+
     <ion-grid fixed="true">
       <div>
         <ion-list>
           <ion-item class="ion-item">
-            <ion-select label="Pencarian Film by Genre" placeholder="Pilih" [value]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)" multiple>
+            <ion-select label="Filter" placeholder="Pilih" [value]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)" multiple>
               <ion-select-option *ngFor="let genre of genreContainerList" [value]="genre.id">{{genre.name}}</ion-select-option>
             </ion-select>
           </ion-item>  
@@ -41,5 +42,13 @@
         </ion-col>
       </ion-row>
     </ion-grid>
+
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+      <ion-infinite-scroll-content
+        loadingSpinner="bubbles"
+        loadingText="Loading more data...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+
   </ion-list>
 </ion-content>

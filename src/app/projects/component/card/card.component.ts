@@ -11,6 +11,7 @@ export class CardComponent implements OnInit {
   @Input() voterRating: string = ''; // Memberikan nilai default
   @Input() model: any = {}; // Memberikan nilai default
   @Input() releaseYear: string = ''; // Memberikan nilai default
+  @Input() runtime?: string;
   @Output() cardEventTrigger: EventEmitter<any> = new EventEmitter();
 
   constructor() {}

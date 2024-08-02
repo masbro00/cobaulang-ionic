@@ -18,9 +18,11 @@ export class Tab1Page implements OnInit {
   genreSelectedValue: any = [];
   filteredGenreId: string = '';
   appCardContainer: any[] = [];  // Untuk film di card
+  filteredAppCardContainer: any[] = []; // Untuk film yang sudah difilter
   loadingCurrentEventData: any;
   currentModal: any[] = [];
   genreLabel: string = 'Film Populer';
+  searchTerm: string = ''; // Properti untuk menyimpan nilai pencarian
 
   constructor(
     private service: ThemoviedbService,
@@ -62,10 +64,17 @@ export class Tab1Page implements OnInit {
 
   filterAndDisplayMovies(movies: any[], container: string): void {
     movies.forEach((movie: any) => {
-      this.service.getReleaseDates(movie.id).subscribe((releaseData: any) => {
-        if (this.isIndonesianMovie(releaseData) || this.isIndonesianLanguage(movie)) {
-          const posterUrl = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
-          if (posterUrl && movie.poster_path) {
+      // Pastikan hanya film yang diproses
+      if (this.modelType === 'movie') {
+        this.service.getReleaseDates(movie.id).subscribe((releaseData: any) => {
+          if (this.isIndonesianMovie(releaseData) || this.isIndonesianLanguage(movie)) {
+            let posterUrl = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+  
+            // Jika tidak ada poster_path, gunakan gambar default
+            if (!movie.poster_path) {
+              posterUrl = 'assets/img/poster.jpg';
+            }
+  
             const releaseYear = this.extractReleaseYear(releaseData);
             const movieData = {
               id: movie.id,
@@ -75,7 +84,7 @@ export class Tab1Page implements OnInit {
               posterPath: posterUrl,
               modelItem: movie
             };
-
+  
             if (container === 'initializeSliderContainer') {
               this.initializeSliderContainer.push(movieData);
             } else {
@@ -85,13 +94,14 @@ export class Tab1Page implements OnInit {
                 voterRating: this.formatRating(movie.vote_average)
               });
             }
-          } else {
-            console.warn('Poster URL is empty for movie:', movie);
+  
+            // Filter movies based on search term
+            this.filterMovies();
           }
-        }
-      });
+        });
+      }
     });
-  }
+  }  
 
   isIndonesianMovie(releaseData: any): boolean {
     if (releaseData && releaseData.results) {
@@ -217,5 +227,22 @@ export class Tab1Page implements OnInit {
         console.error('Error fetching genres:', error);
       }
     });
+  }
+
+  // Method for handling search input
+  onSearchInput(event: any) {
+    this.searchTerm = event.target.value;
+    this.filterMovies();
+  }
+
+  // Method to filter movies based on search term
+  filterMovies() {
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      this.filteredAppCardContainer = this.appCardContainer.filter(item => 
+        item.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    } else {
+      this.filteredAppCardContainer = [...this.appCardContainer];
+    }
   }
 }

@@ -53,40 +53,42 @@ export class ModelPageComponent implements OnInit, OnChanges {
   initializeContainer() {
     if (this.modelItemList) {
       this.isLoading = true;
-
+  
       this.title = this.modelType === 'movie' ? this.modelItemList.detailResponseEl.title : this.modelItemList.detailResponseEl.original_name;
       this.id = this.modelItemList.detailResponseEl.id || '';
       this.backgroundImage = this.modelItemList.detailResponseEl.backdrop_path
         ? 'https://image.tmdb.org/t/p/w500/' + this.modelItemList.detailResponseEl.backdrop_path
         : 'assets/img/bgnull.jpg';
-
-      this.overview = this.modelItemList.detailResponseEl.overview ? this.modelItemList.detailResponseEl.overview : 'No overview available';
+  
+      this.overview = this.modelItemList.detailResponseEl.overview ? this.modelItemList.detailResponseEl.overview : 'Sipnosis Tidak Tersedia.';
       console.log('Overview:', this.overview);
-
+  
       this.releasedate = this.modelType === 'movie' ? this.modelItemList.detailResponseEl.release_date || '' : this.modelItemList.detailResponseEl.first_air_date || '';
-      
+  
       if (this.modelType === 'movie') {
         this.runtime = (this.modelItemList.detailResponseEl.runtime || '') + ' Menit';
       } else if (this.modelType === 'tv') {
-        this.runtime = 'N/A'; // TV Show tidak memiliki durasi total
+        // TV Shows biasanya memiliki runtime per episode
+        const runtime = this.modelItemList.detailResponseEl.episode_run_time;
+        this.runtime = runtime && runtime.length > 0 ? runtime[0] + ' Menit' : 'Durasi tidak tersedia';
       }
-
+  
       this.voterRating = 'Penilaian: ' + (Number(this.modelItemList.detailResponseEl.vote_average * 10).toFixed(2)) + '%';
-
+  
       this.castItemList = this.modelItemList.creditsResponseEl?.cast.map((element: any) => ({
         ...element,
         profile_path: element.profile_path ? 'https://image.tmdb.org/t/p/w138_and_h175_face/' + element.profile_path : ''
       })) || [];
-
+  
       this.crewItemList = this.modelItemList.creditsResponseEl?.crew.map((element: any) => ({
         ...element,
         profile_path: element.profile_path ? 'https://image.tmdb.org/t/p/w138_and_h175_face/' + element.profile_path : '',
         job: this.translateJob(element.job) // Menerjemahkan pekerjaan kru
       })) || [];
-
+  
       this.isLoading = false;
       this.cdr.detectChanges();
-
+  
       this.initializeRecomendationsContainer();
     }
 
