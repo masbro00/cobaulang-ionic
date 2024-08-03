@@ -18,7 +18,14 @@
       <div>
         <ion-list>
           <ion-item class="ion-item">
-            <ion-select label="Filter" placeholder="Pilih" [value]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)" multiple>
+            <ion-select 
+              label="Filter" 
+              placeholder="Pilih" 
+              [value]="genreSelectedValue" 
+              (ionChange)="genreSelectionChanged($event)" 
+              multiple 
+              cancelText="Batal"
+              okText="OK">
               <ion-select-option *ngFor="let genre of genreContainerList" [value]="genre.id">{{genre.name}}</ion-select-option>
             </ion-select>
           </ion-item>  
