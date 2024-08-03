@@ -11,6 +11,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 8px;
   }
   
   .card:hover {
@@ -25,11 +26,11 @@
     padding: 4px 8px; /* Menambahkan padding dalam badge */
     font-size: 14px; /* Mengatur ukuran font badge */
     font-weight: bold; /* Membuat teks badge tebal */
-    margin-top: 8px; /* Menambahkan jarak atas untuk badge */
     text-align: center; /* Mengatur teks agar rata tengah */
   }
   
   .text-content {
+    display: contents;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
