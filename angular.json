@@ -32,7 +32,7 @@
               },
               {
                 "glob": "manifest.webmanifest",
-                "input": "src/",
+                "input": "src",
                 "output": "/"
               }
             ],
