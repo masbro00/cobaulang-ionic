@@ -28,11 +28,12 @@ export class ModelPageComponent implements OnInit, OnChanges {
   isVideoEnabled: boolean = false;
   dangerousVideoUrl: string = '';
   videoUrl: any;
+  videoId: string = '';
 
   constructor(
     private service: ThemoviedbService,
     private tvShowService: ThemoviedbTvShowService,
-    private sanitizer: DomSanitizer,
+    public sanitizer: DomSanitizer,
     private modalController: ModalController,
     private cdr: ChangeDetectorRef,
     private platform: Platform,
@@ -68,7 +69,6 @@ export class ModelPageComponent implements OnInit, OnChanges {
       if (this.modelType === 'movie') {
         this.runtime = (this.modelItemList.detailResponseEl.runtime || '') + ' Menit';
       } else if (this.modelType === 'tv') {
-        // TV Shows biasanya memiliki runtime per episode
         const runtime = this.modelItemList.detailResponseEl.episode_run_time;
         this.runtime = runtime && runtime.length > 0 ? runtime[0] + ' Menit' : 'Durasi tidak tersedia';
       }
@@ -83,7 +83,7 @@ export class ModelPageComponent implements OnInit, OnChanges {
       this.crewItemList = this.modelItemList.creditsResponseEl?.crew.map((element: any) => ({
         ...element,
         profile_path: element.profile_path ? 'https://image.tmdb.org/t/p/w138_and_h175_face/' + element.profile_path : '',
-        job: this.translateJob(element.job) // Menerjemahkan pekerjaan kru
+        job: this.translateJob(element.job) 
       })) || [];
   
       this.isLoading = false;
@@ -93,7 +93,8 @@ export class ModelPageComponent implements OnInit, OnChanges {
     }
 
     if (this.modelItemList?.videos?.results?.length > 0) {
-      this.dangerousVideoUrl = 'https://www.youtube.com/embed/' + this.modelItemList.videos.results[0].key;
+      this.videoId = this.modelItemList.videos.results[0].key; // Simpan ID video
+      this.dangerousVideoUrl = 'https://www.youtube.com/embed/' + this.videoId;
       this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.dangerousVideoUrl);
     }
   }
@@ -239,8 +240,6 @@ export class ModelPageComponent implements OnInit, OnChanges {
       "VFX Editor": "Editor Efek Visual",
       "Pipeline Technical Director": "Direktur Teknis",
       "Compositing Lead": "Penggabung AudioVideo",
-
-      // Tambahkan terjemahan pekerjaan lain yang diperlukan di sini
     };
 
     return jobTranslation[job] || job;

@@ -15,9 +15,9 @@
   <div class="media-container">
     <ion-img [src]="backgroundImage" *ngIf="!isVideoEnabled"></ion-img>
     <div class="open-video" *ngIf="isVideoEnabled">
-      <iframe [src]="videoUrl" allowfullscreen></iframe>
+      <iframe class="video-iframe" [src]="sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + videoId)" allowfullscreen></iframe>
+    </div>    
     </div>
-  </div>
 
   <div class="content-padding">
     <ion-toolbar class="custom-toolbar">
