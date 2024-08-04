@@ -245,4 +245,21 @@ export class Tab1Page implements OnInit {
       this.filteredAppCardContainer = [...this.appCardContainer];
     }
   }
+
+  onGenreClick(event: MouseEvent) {
+    // Nonaktifkan pointer-events pada slider
+    const swiperContainer = document.getElementById(this.swiperContainerId);
+    if (swiperContainer) {
+      swiperContainer.style.pointerEvents = 'none';
+    }
+
+    // Kembalikan pointer-events setelah beberapa waktu
+    setTimeout(() => {
+      if (swiperContainer) {
+        swiperContainer.style.pointerEvents = 'auto';
+      }
+    }, 200); // Atur waktu sesuai kebutuhan
+
+    event.stopPropagation(); // Menghentikan propagasi klik pada elemen lain
+  }
 }

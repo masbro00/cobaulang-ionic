@@ -10,17 +10,19 @@ import { forkJoin } from 'rxjs';
   styleUrls: ['tab2.page.scss']
 })
 export class Tab2Page implements OnInit {
-  modelType: string = 'tv';
-  initializeSliderContainer: any[] = [];
+  modelType: string = 'tv'; // Mengganti dari 'movie' ke 'tv'
+  initializeSliderContainer: any[] = [];  // Untuk acara TV di slider
   swiperContainerId: string = 'swiper-container';
   genreContainerList: any[] = [];
   page: number = 1;
+  genreSelectedValue: any = [];
   filteredGenreId: string = '';
-  appCardContainer: any[] = [];
+  appCardContainer: any[] = [];  // Untuk acara TV di card
+  filteredAppCardContainer: any[] = []; // Untuk acara TV yang sudah difilter
   loadingCurrentEventData: any;
   currentModal: any[] = [];
-  genreSelectedValue: string[] = [];
-  genreLabel: string = 'Acara Populer';
+  genreLabel: string = 'Acara TV Populer';
+  searchTerm: string = ''; // Properti untuk menyimpan nilai pencarian
 
   constructor(
     private tvShowService: ThemoviedbTvShowService,
@@ -28,84 +30,94 @@ export class Tab2Page implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadLatestReleases();
+    this.loadLatestReleases(); // Memuat rilis terbaru
     this.initializeGenreContainer();
     this.loadPopularTVShows();
   }
 
   loadLatestReleases(): void {
     this.tvShowService.getLatestReleases().subscribe(
-      (latestReleases: any) => {
-        const filteredTVShows = latestReleases.results.filter((tvShow: any) => {
-          return tvShow.original_language === 'id' && tvShow.origin_country.includes('ID');
-        });
-
-        this.initializeSliderContainer = filteredTVShows.map((tvShow: any) => ({
-          id: tvShow.id,
-          title: tvShow.name,
-          image: `https://image.tmdb.org/t/p/w500${tvShow.poster_path}`,
-          posterPath: `https://image.tmdb.org/t/p/w500${tvShow.poster_path}`,
-          releaseDate: tvShow.first_air_date,
-          runtime: tvShow.episode_run_time && tvShow.episode_run_time.length > 0 ? tvShow.episode_run_time[0] : 'Unknown'
-        }));
+      (latestTVShowsEl: any) => {
+        this.filterAndDisplayTVShows(latestTVShowsEl.results, 'initializeSliderContainer');
       },
       (error: any) => {
-        console.error('Error fetching latest TV releases:', error);
+        console.error('Error fetching latest TV shows for slider:', error);
       }
     );
   }
 
   loadPopularTVShows(): void {
-    this.tvShowService.getPopularList(this.page, this.filteredGenreId).subscribe(
-      (popularTVShows: any) => {
-        console.log('Raw TV shows:', popularTVShows.results); // Tambahkan log ini
-        const filteredShows = popularTVShows.results.filter((tvShow: any) => tvShow.origin_country.includes('ID'));
-        console.log('Filtered TV shows:', filteredShows); // Tambahkan log ini
-
-        const formattedShows = filteredShows.map((tvShow: any) => ({
-          id: tvShow.id,
-          title: tvShow.name,
-          description: tvShow.overview,
-          image: `https://image.tmdb.org/t/p/w500${tvShow.poster_path}`,
-          voterRating: tvShow.vote_average.toFixed(1),
-          releaseYear: tvShow.first_air_date ? new Date(tvShow.first_air_date).getFullYear().toString() : 'Unknown',
-          runtime: tvShow.episode_run_time ? tvShow.episode_run_time[0].toString() : 'Unknown', // Pastikan runtime dikonversi ke string
-          modelItem: tvShow        
-        }));
-        console.log('Formatted shows:', formattedShows); // Periksa log ini
-
-        this.appCardContainer.push(...formattedShows);
-        console.log('Updated appCardContainer:', this.appCardContainer);
-
-        if (this.page > 1 && this.loadingCurrentEventData) {
-          this.loadingCurrentEventData.target.complete();
-          if (popularTVShows.results.length === 0) {
-            this.loadingCurrentEventData.target.disabled = true;
-          }
-        }
+    this.tvShowService.getPopularList(this.page, this.filteredGenreId).subscribe({
+      next: (popularTVShowsEl: any) => {
+        this.filterAndDisplayTVShows(popularTVShowsEl.results, 'appCardContainer');
       },
-      (error: any) => {
+      error: (error: any) => {
         console.error('Error fetching popular TV shows:', error);
-        if (this.page > 1 && this.loadingCurrentEventData) {
+      },
+      complete: () => {
+        if (this.loadingCurrentEventData && this.loadingCurrentEventData.target) {
           this.loadingCurrentEventData.target.complete();
         }
       }
-    );
+    });
   }
 
-  genreSelectionChanged(event: any): void {
-    const selectedGenres = event.detail.value;
-    if (selectedGenres.length > 0 || this.filteredGenreId !== '') {
-      this.page = 1;
-      this.appCardContainer = [];
-      this.filteredGenreId = selectedGenres.toString();
-      this.genreSelectedValue = selectedGenres;
-      this.updateGenreLabel();
-      this.loadPopularTVShows();
+  filterAndDisplayTVShows(tvShows: any[], container: string): void {
+    tvShows.forEach((tvShow: any) => {
+      let posterUrl = `https://image.tmdb.org/t/p/w500${tvShow.poster_path}`;
+
+      // Jika tidak ada poster_path, gunakan gambar default
+      if (!tvShow.poster_path) {
+        posterUrl = 'assets/img/poster.jpg';
+      }
+
+      const tvShowData = {
+        id: tvShow.id,
+        title: tvShow.name,
+        releaseYear: this.extractReleaseYear(tvShow),
+        image: posterUrl,
+        posterPath: posterUrl,
+        modelItem: tvShow
+      };
+
+      if (container === 'initializeSliderContainer') {
+        this.initializeSliderContainer.push(tvShowData);
+      } else {
+        this.appCardContainer.push({
+          ...tvShowData,
+          description: tvShow.overview,
+          voterRating: this.formatRating(tvShow.vote_average)
+        });
+      }
+
+      // Filter TV shows based on search term
+      this.filterTVShows();
+    });
+  }
+
+  extractReleaseYear(tvShow: any): string {
+    // Gunakan tahun rilis dari data tvShow
+    if (tvShow.first_air_date) {
+      const releaseDate = new Date(tvShow.first_air_date);
+      return releaseDate.getFullYear().toString();
     }
+    return 'N/A';
   }
 
-  updateGenreLabel(): void {
+  formatRating(voteAverage: number): string {
+    return `${(voteAverage * 1).toFixed(1)}`;
+  }
+
+  genreSelectionChanged(event: any) {
+    this.genreSelectedValue = event.detail.value;
+    this.updateGenreLabel();
+    this.page = 1;
+    this.appCardContainer = [];
+    this.filteredGenreId = this.genreSelectedValue.toString();
+    this.loadPopularTVShows();
+  }
+
+  updateGenreLabel() {
     if (this.genreSelectedValue.length > 0) {
       const selectedGenres = this.genreContainerList.filter(genre =>
         this.genreSelectedValue.includes(genre.id)
@@ -113,22 +125,22 @@ export class Tab2Page implements OnInit {
       const genreNames = selectedGenres.map(genre => genre.name);
       this.genreLabel = genreNames.join(', ');
     } else {
-      this.genreLabel = 'Acara Populer';
+      this.genreLabel = 'Acara TV Populer';
     }
   }
 
   loadData(event: any) {
-    console.log('Infinite scroll triggered');
     this.page += 1;
     this.loadingCurrentEventData = event;
     this.loadPopularTVShows();
   }
 
-  async presentModal(tvShow: any): Promise<void> {
+  async presentModal(modelItem: any) {
+    console.log('Presenting modal for:', modelItem);
     const modal = await this.modalController.create({
       component: ModelPageComponent,
       componentProps: {
-        modelItemList: tvShow,
+        modelItemList: modelItem,
         modelType: this.modelType
       }
     });
@@ -136,26 +148,28 @@ export class Tab2Page implements OnInit {
     this.currentModal.push(modal);
   }
 
-  async dismissModal(): Promise<void> {
+  async dismissModal() {
     if (this.currentModal.length > 0) {
       const modal = this.currentModal.pop();
       await modal.dismiss();
     }
   }
 
-  cardEventListener(tvShow: any): void {
+  cardEventListener(modelItem: any) {
+    console.log('Card event listener triggered for:', modelItem);
     forkJoin({
-      detailResponse: this.tvShowService.getDetailList(tvShow.id),
-      creditResponse: this.tvShowService.getCreditsList(tvShow.id),
-      videoResponse: this.tvShowService.getVideoList(tvShow.id)
+      detailResponse: this.tvShowService.getDetailList(modelItem.id),
+      creditResponse: this.tvShowService.getCreditsList(modelItem.id),
+      videoResponse: this.tvShowService.getVideoList(modelItem.id)
     }).subscribe({
-      next: response => {
-        tvShow.detailResponseEl = response.detailResponse;
-        tvShow.creditsResponseEl = response.creditResponse;
-        tvShow.videos = response.videoResponse;
-        this.presentModal(tvShow);
+      next: (response) => {
+        modelItem.detailResponseEl = response.detailResponse;
+        modelItem.creditsResponseEl = response.creditResponse;
+        modelItem.videos = response.videoResponse;
+        console.log('Data fetched for modal:', modelItem);
+        this.presentModal(modelItem);
       },
-      error: err => {
+      error: (err) => {
         console.error('Error fetching data', err);
       }
     });
@@ -164,26 +178,66 @@ export class Tab2Page implements OnInit {
   changeSlide(prevOrNext: number): void {
     const swiperContainer = document.getElementById(this.swiperContainerId) as any;
     if (swiperContainer) {
-      prevOrNext === -1 ? swiperContainer.swiper.slidePrev() : swiperContainer.swiper.slideNext();
+      if (prevOrNext === -1) {
+        swiperContainer.swiper.slidePrev();
+      } else {
+        swiperContainer.swiper.slideNext();
+      }
     }
   }
 
-  sliderClickEventTrigger(modelItem: any): void {
+  sliderClickEventTrigger(modelItem: any) {
+    console.log('Slider item clicked:', modelItem);
     this.cardEventListener(modelItem);
   }
 
-  initializeGenreContainer(): void {
+  initializeGenreContainer() {
     this.tvShowService.getGenreList().subscribe({
-      next: (genreList: any) => {
-        if (genreList && genreList.genres) {
-          this.genreContainerList = genreList.genres;
+      next: (genreEl: any) => {
+        if (genreEl && genreEl.genres) {
+          console.log('Genres obtained:', genreEl.genres);
+          this.genreContainerList = genreEl.genres;
         } else {
-          console.error('Invalid genre data:', genreList);
+          console.error('Invalid genre data:', genreEl);
         }
       },
       error: (error: any) => {
         console.error('Error fetching genres:', error);
       }
     });
+  }
+
+  // Method for handling search input
+  onSearchInput(event: any) {
+    this.searchTerm = event.target.value;
+    this.filterTVShows();
+  }
+
+  // Method to filter TV shows based on search term
+  filterTVShows() {
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      this.filteredAppCardContainer = this.appCardContainer.filter(item => 
+        item.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    } else {
+      this.filteredAppCardContainer = [...this.appCardContainer];
+    }
+  }
+
+  onGenreClick(event: MouseEvent) {
+    // Nonaktifkan pointer-events pada slider
+    const swiperContainer = document.getElementById(this.swiperContainerId);
+    if (swiperContainer) {
+      swiperContainer.style.pointerEvents = 'none';
+    }
+
+    // Kembalikan pointer-events setelah beberapa waktu
+    setTimeout(() => {
+      if (swiperContainer) {
+        swiperContainer.style.pointerEvents = 'auto';
+      }
+    }, 200); // Atur waktu sesuai kebutuhan
+
+    event.stopPropagation(); // Menghentikan propagasi klik pada elemen lain
   }
 }

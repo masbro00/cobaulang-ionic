@@ -11,32 +11,28 @@
 
 <ion-content [fullscreen]="true">
   <ion-list>
-    <app-slider [sliderInputValue]="initializeSliderContainer" (itemClicked)="cardEventListener($event)"></app-slider>
+    <!-- Slider untuk film -->
+    <app-slider [sliderInputValue]="initializeSliderContainer" (itemClicked)="sliderClickEventTrigger($event)"></app-slider>
 
+    <!-- Genre dan film -->
     <ion-grid fixed="true">
-      <div>
-        <ion-list>
-          <ion-item class="ion-item">
-            <ion-select 
-              label="Filter" 
-              placeholder="Pilih" 
-              [value]="genreSelectedValue" 
-              (ionChange)="genreSelectionChanged($event)" 
-              multiple 
-              cancelText="Batal" 
-              okText="OK">
-              <ion-select-option *ngFor="let genre of genreContainerList" [value]="genre.id">{{genre.name}}</ion-select-option>
-            </ion-select>
-          </ion-item>  
-
-          <ion-item>
-            <ion-label style="font-size: 18px;">{{ genreLabel }}</ion-label>
-          </ion-item>
-        </ion-list>
-      </div>
+      <ion-row>
+        <ion-col>
+          <div class="scroll-wrapper">
+            <ion-segment [(ngModel)]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)">
+              <ion-segment-button 
+                *ngFor="let genre of genreContainerList" 
+                [value]="genre.id"
+                (click)="onGenreClick($event)">
+                <ion-label>{{ genre.name }}</ion-label>
+              </ion-segment-button>
+            </ion-segment>
+          </div>
+        </ion-col>
+      </ion-row>
 
       <ion-row>
-        <ion-col size="6" size-md="4" size-lg="3" *ngFor="let item of appCardContainer">
+        <ion-col size="6" size-md="4" size-lg="3" *ngFor="let item of filteredAppCardContainer">
           <app-card 
             [title]="item.title" 
             [image]="item.image" 
@@ -49,6 +45,7 @@
       </ion-row>
     </ion-grid>
 
+    <!-- Infinite scroll untuk memuat lebih banyak data -->
     <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
       <ion-infinite-scroll-content
         loadingSpinner="bubbles"

@@ -7,6 +7,16 @@
     <ion-buttons slot="end"></ion-buttons>
   </ion-toolbar>
   <ion-toolbar>
+    <ion-segment [(ngModel)]="isMovieSearch" (ionChange)="filterList()">
+      <ion-segment-button [value]="true">
+        <ion-label>Film</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="false">
+        <ion-label>Acara TV</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+  <ion-toolbar>
     <ion-searchbar placeholder="Masukkan Judul..." [(ngModel)]="searchValue" (ionChange)="filterList()"></ion-searchbar>
   </ion-toolbar>
 </ion-header>

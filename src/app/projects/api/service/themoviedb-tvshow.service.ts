@@ -88,16 +88,16 @@ export class ThemoviedbTvShowService {
     const requestURL = `${this.baseURL}/tv/${tvShowId}/season/${seasonNumber}/episode/${episodeNumber}?${this.apiKey}&${this.language}`;
     return this.http.get(requestURL);
   }
-
-  getsearchTVShows(query: string, page: number): Observable<any> {
-    const requestURL = `${this.baseURL}/search/tv?${this.apiKey}&${this.language}&${this.country}&page=${page}&query=${query}`;
-    return this.http.get(requestURL);
-  }
   
   getTVShowDetails(tvShowId: number): Observable<any> {
     const url = `${this.baseURL}/tv/${tvShowId}?${this.apiKey}&${this.language}`;
     return this.http.get<any>(url);
   }
-  
 
+  getsearchTVShows(query: string, page: number): Observable<any> {
+    const requestURL = `${this.baseURL}/search/tv?${this.apiKey}&${this.language}&page=${page}&query=${query}`;
+    console.log('API URL:', requestURL);
+    return this.http.get(requestURL);
+  }
+  
 }

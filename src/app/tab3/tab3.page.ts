@@ -16,7 +16,7 @@ export class Tab3Page implements OnInit {
   page: number = 1;
   loadingCurrentEventData: any;
   currentModal: any[] = [];
-  isMovieSearch: boolean = true; // Flag to toggle between movie and TV show search
+  isMovieSearch: boolean = true; // Flag untuk memilih antara pencarian film atau TV show
 
   constructor(
     private movieService: ThemoviedbService,
@@ -25,15 +25,13 @@ export class Tab3Page implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Initial load can be implemented if required
+    // Inisialisasi awal jika diperlukan
   }
 
   filterList() {
-    if (this.searchValue.trim() !== '') {
-      this.page = 1;
-      this.searchCardContainer = [];
-      this.loadSearchResults();
-    }
+    this.page = 1;
+    this.searchCardContainer = [];
+    this.loadSearchResults();
   }
 
   loadSearchResults() {
