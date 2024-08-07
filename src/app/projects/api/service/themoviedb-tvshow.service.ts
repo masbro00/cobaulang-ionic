@@ -21,26 +21,26 @@ export class ThemoviedbTvShowService {
 
   getTrendingList(): Observable<any> {
     const url = `${this.baseURL}/trending/tv/week?${this.apiKey}&${this.language}&${this.country}`;
-    console.log('API URL:', url); // Tambahkan log untuk memastikan URL API benar
+    console.log('API URL:', url); 
     return this.http.get<any>(url);
   }
   
   getLatestReleases(): Observable<any> {
     const today = new Date().toISOString().split('T')[0]; // Format tanggal hari ini sebagai YYYY-MM-DD
     const url = `${this.baseURL}/discover/tv?${this.apiKey}&${this.language}&${this.country}&sort_by=first_air_date.desc&first_air_date.lte=${today}`;
-    console.log('API URL:', url); // Tambahkan log untuk memastikan URL API benar
+    console.log('API URL:', url); 
     return this.http.get<any>(url);
   }
   
   getOnTheAir(): Observable<any> {
     const url = `${this.baseURL}/tv/on_the_air?${this.apiKey}&${this.language}`;
-    console.log('API URL:', url); // Tambahkan log untuk memastikan URL API benar
+    console.log('API URL:', url); 
     return this.http.get<any>(url);
   }  
 
   getAiringToday(): Observable<any> {
     const url = `${this.baseURL}/tv/airing_today?${this.apiKey}&${this.language}`;
-    console.log('API URL:', url); // Tambahkan log untuk memastikan URL API benar
+    console.log('API URL:', url); 
     return this.http.get<any>(url);
   }  
 
