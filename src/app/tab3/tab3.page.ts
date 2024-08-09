@@ -45,7 +45,7 @@ export class Tab3Page implements OnInit {
           const formattedResults = filteredResults.map((item: any) => ({
             id: item.id,
             title: item.title || item.name,
-            image: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+            image: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'assets/img/poster.jpg',
             voterRating: item.vote_average.toFixed(1),
             releaseYear: item.release_date ? new Date(item.release_date).getFullYear().toString() : 'Unknown',
             modelItem: item
