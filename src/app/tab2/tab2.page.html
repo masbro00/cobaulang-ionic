@@ -14,12 +14,23 @@
     <!-- Slider untuk film -->
     <app-slider [sliderInputValue]="initializeSliderContainer" (itemClicked)="sliderClickEventTrigger($event)"></app-slider>
 
-    <!-- Genre dan film -->
-    <ion-grid fixed="true">
-      <ion-row>
-        <ion-col>
+   <!-- Genre dan film -->
+   <ion-grid fixed="true">
+    <ion-row>
+      <ion-col>
+        <div class="filter-container">
+          <!-- Menambahkan label "Filter" di atas slider genre -->
+          <h2>Filter</h2>
           <div class="scroll-wrapper">
             <ion-segment [(ngModel)]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)">
+              <!-- Menambahkan opsi "Semua" -->
+              <ion-segment-button 
+                value="" 
+                (click)="onGenreClick($event)">
+                <ion-label>Semua</ion-label>
+              </ion-segment-button>
+              
+              <!-- Menampilkan daftar genre dari genreContainerList -->
               <ion-segment-button 
                 *ngFor="let genre of genreContainerList" 
                 [value]="genre.id"
@@ -28,30 +39,30 @@
               </ion-segment-button>
             </ion-segment>
           </div>
-        </ion-col>
-      </ion-row>
+        </div>
+      </ion-col>
+    </ion-row>
 
-      <ion-row>
-        <ion-col size="6" size-md="4" size-lg="3" *ngFor="let item of filteredAppCardContainer">
-          <app-card 
-            [title]="item.title" 
-            [image]="item.image" 
-            [model]="item.modelItem" 
-            [voterRating]="item.voterRating" 
-            [releaseYear]="item.releaseYear"
-            [runtime]="item.runtime"
-            (cardEventTrigger)="cardEventListener($event)">
-          </app-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+    <ion-row>
+      <ion-col size="6" size-md="4" size-lg="3" *ngFor="let item of filteredAppCardContainer">
+        <app-card 
+          [title]="item.title" 
+          [image]="item.image" 
+          [model]="item.modelItem" 
+          [voterRating]="item.voterRating" 
+          [releaseYear]="item.releaseYear"
+          (cardEventTrigger)="cardEventListener($event)">
+        </app-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
-    <!-- Infinite scroll untuk memuat lebih banyak data -->
-    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
-      <ion-infinite-scroll-content
-        loadingSpinner="bubbles"
-        loadingText="Memuat lebih banyak...">
-      </ion-infinite-scroll-content>
-    </ion-infinite-scroll>
-  </ion-list>
+  <!-- Infinite scroll untuk memuat lebih banyak data -->
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Memuat lebih banyak...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-list>
 </ion-content>

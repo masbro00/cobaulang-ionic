@@ -36,7 +36,7 @@ export class Tab3Page implements OnInit {
 
   loadSearchResults() {
     if (this.isMovieSearch) {
-      this.movieService.getsearchMovies(this.searchValue, this.page).subscribe({
+      this.movieService. getSearchMovies(this.searchValue, this.page).subscribe({
         next: (response: any) => {
           const filteredResults = response.results.filter((item: any) => {
             return item.original_language === 'id' || (item.origin_country && item.origin_country.includes('ID'));

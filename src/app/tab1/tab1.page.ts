@@ -30,13 +30,13 @@ export class Tab1Page implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadPopularMoviesForSlider(); // Memuat film populer untuk slider
+    this.loadPopularMoviesForSlider(); // Memuat film yang akan datang untuk slider
     this.initializeGenreContainer();
     this.loadPopularMovies();
-  }
+  }  
 
   loadPopularMoviesForSlider(): void {
-    this.service.getPopularList(this.page, this.filteredGenreId).subscribe(
+    this.service.getPopularMoviesByYearRange(this.page, this.filteredGenreId).subscribe(
       (popularMoviesEl: any) => {
         this.filterAndDisplayMovies(popularMoviesEl.results, 'initializeSliderContainer');
       },
@@ -44,7 +44,7 @@ export class Tab1Page implements OnInit {
         console.error('Error fetching popular movies for slider:', error);
       }
     );
-  }
+  }  
 
   loadPopularMovies(): void {
     this.service.getPopularList(this.page, this.filteredGenreId).subscribe({

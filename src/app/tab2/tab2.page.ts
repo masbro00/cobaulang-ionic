@@ -47,7 +47,7 @@ export class Tab2Page implements OnInit {
   }
 
   loadPopularTVShows(): void {
-    this.tvShowService.getPopularList(this.page, this.filteredGenreId).subscribe({
+    this.tvShowService.getPopularTVShowsByYearRange(this.page, this.filteredGenreId).subscribe({
       next: (popularTVShowsEl: any) => {
         this.filterAndDisplayTVShows(popularTVShowsEl.results, 'appCardContainer');
       },
@@ -60,7 +60,7 @@ export class Tab2Page implements OnInit {
         }
       }
     });
-  }
+  }  
 
   filterAndDisplayTVShows(tvShows: any[], container: string): void {
     tvShows.forEach((tvShow: any) => {

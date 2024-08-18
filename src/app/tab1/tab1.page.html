@@ -18,15 +18,27 @@
     <ion-grid fixed="true">
       <ion-row>
         <ion-col>
-          <div class="scroll-wrapper">
-            <ion-segment [(ngModel)]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)">
-              <ion-segment-button 
-                *ngFor="let genre of genreContainerList" 
-                [value]="genre.id"
-                (click)="onGenreClick($event)">
-                <ion-label>{{ genre.name }}</ion-label>
-              </ion-segment-button>
-            </ion-segment>
+          <div class="filter-container">
+            <!-- Menambahkan label "Filter" di atas slider genre -->
+            <h2>Filter</h2>
+            <div class="scroll-wrapper">
+              <ion-segment [(ngModel)]="genreSelectedValue" (ionChange)="genreSelectionChanged($event)">
+                <!-- Menambahkan opsi "Semua" -->
+                <ion-segment-button 
+                  value="" 
+                  (click)="onGenreClick($event)">
+                  <ion-label>Semua</ion-label>
+                </ion-segment-button>
+                
+                <!-- Menampilkan daftar genre dari genreContainerList -->
+                <ion-segment-button 
+                  *ngFor="let genre of genreContainerList" 
+                  [value]="genre.id"
+                  (click)="onGenreClick($event)">
+                  <ion-label>{{ genre.name }}</ion-label>
+                </ion-segment-button>
+              </ion-segment>
+            </div>
           </div>
         </ion-col>
       </ion-row>
