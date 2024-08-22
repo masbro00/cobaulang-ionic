@@ -3,6 +3,7 @@ import { ModalController } from '@ionic/angular';
 import { ThemoviedbService } from '../projects/api/service/themoviedb.service';
 import { ModelPageComponent } from '../projects/component/model-page/model-page.component';
 import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators'; // Pastikan map diimpor dari rxjs/operators
 
 @Component({
   selector: 'app-tab1',
@@ -36,9 +37,11 @@ export class Tab1Page implements OnInit {
   }  
 
   loadPopularMoviesForSlider(): void {
-    this.service.getPopularMoviesByYearRange(this.page, this.filteredGenreId).subscribe(
+    this.service.getPopularMoviesByYearRange(this.page, this.filteredGenreId).pipe(
+      map((response: any) => response.results.slice(0, 8)) // Batasi hanya 5 film
+    ).subscribe(
       (popularMoviesEl: any) => {
-        this.filterAndDisplayMovies(popularMoviesEl.results, 'initializeSliderContainer');
+        this.filterAndDisplayMovies(popularMoviesEl, 'initializeSliderContainer');
       },
       (error: any) => {
         console.error('Error fetching popular movies for slider:', error);

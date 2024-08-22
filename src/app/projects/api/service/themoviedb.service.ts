@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.prod';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -82,11 +83,12 @@ export class ThemoviedbService {
 
   getPopularMoviesByYearRange(page: number, genres: string): Observable<any> {
     const currentYear = new Date().getFullYear();
-    const requestURL = `${this.baseURL}/discover/movie?${this.apiKey}&${this.language}&${this.country}&sort_by=upcoming.desc&primary_release_date.gte=2024-08-09&primary_release_date.lte=${currentYear}-12-31&page=${page}&with_genres=${genres}`;
+    const requestURL = `${this.baseURL}/discover/movie?${this.apiKey}&${this.language}&${this.country}&sort_by=popularity.desc&primary_release_date.gte=2024-08-18&primary_release_date.lte=${currentYear}-10-31&page=${page}&with_genres=${genres}`;
     
     console.log('API URL:', requestURL);
     return this.http.get(requestURL);
-  }  
+  }
+  
 
   getSearchMovies(query: string, page: number): Observable<any> {
     const requestURL = `${this.baseURL}/search/movie?${this.apiKey}&${this.language}&${this.country}&page=${page}&query=${query}`;
