@@ -83,7 +83,7 @@ export class ThemoviedbService {
 
   getPopularMoviesByYearRange(page: number, genres: string): Observable<any> {
     const currentYear = new Date().getFullYear();
-    const requestURL = `${this.baseURL}/discover/movie?${this.apiKey}&${this.language}&${this.country}&sort_by=popularity.desc&primary_release_date.gte=2024-08-18&primary_release_date.lte=${currentYear}-10-31&page=${page}&with_genres=${genres}`;
+    const requestURL = `${this.baseURL}/discover/movie?${this.apiKey}&${this.language}&${this.country}&sort_by=popularity.desc&primary_release_date.gte=2024-09-1&primary_release_date.lte=${currentYear}-10-31&page=${page}&with_genres=${genres}`;
     
     console.log('API URL:', requestURL);
     return this.http.get(requestURL);
